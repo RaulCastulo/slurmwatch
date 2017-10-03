@@ -428,6 +428,10 @@ def crear_pantalla(stdscr):
         if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
             cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida) 
         elif(k == ord("\n")):
+            """
+               Queda pendiente validar esta funcion para su ejecucion de forma remota
+               en esta version solo funciona en forma local como administrador
+            """
             #Recuperamos la informacion de la linea en la que actualmente estael cursor
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             #Guardamos cada una de las cadenas que contiene la linea en un arreglo
@@ -436,15 +440,23 @@ def crear_pantalla(stdscr):
     	    salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
             crear_subpantalla(stdscr, salida)
         elif(k == ord('w')):
+            """
+               Queda pendiente validar esta funcion para su ejecucion de forma remota
+               en esta version solo funciona en forma local como administrador
+            """
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             datos = linea.split()
 	    nodo = validar_nodo(datos[-1])
 	    crear_pantalla_htop(stdscr, nodo)
         elif(k == ord('e')):
+            """
+               Queda pendiente validar esta funcion para su ejecucion de forma remota
+               en esta version solo funciona en forma local como administrador
+            """
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             datos =  linea.split()
 	    usr = datos[-6]
-	    nodo = datos[-1]
+	    nodo = validar_nodo(datos[-1])
 	    salida = commands.getoutput("ssh "+nodo+" pstree -u "+usr+" -plac")
             crear_subpantalla(stdscr, salida)
         elif(k == ord('u')):
