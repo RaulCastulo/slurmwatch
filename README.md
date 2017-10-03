@@ -1,7 +1,7 @@
-#MANUAL DE USUARIO#
+#MANUAL DE USUARIO
 
 
-##1. OBJETIVOS DE LA APLICACION##
+##1. OBJETIVOS DE LA APLICACION
 
 Permitir la impresión de la información correspondiente a los trabajos que estan alojados en el servidor para poder tener una mejor administración de éstos. 
 
@@ -10,7 +10,7 @@ Permitir la impresión de la información correspondiente a los trabajos que est
 La aplicación permite desplegar a través de una terminal la información obtenida de los trabajos alojados en el servidor.
 
 
-##2. INGRESO A LA APLICACION##
+##2. INGRESO A LA APLICACION
 
 La aplicación contempla el uso de parámetros al momento de su ejecución, los parámetros que acepta y la explicación de la información que éstos muestran se describe a continuación: 
 
@@ -32,7 +32,7 @@ La aplicación contempla el uso de parámetros al momento de su ejecución, los 
 
 En caso de que no se utilicen parametros al ejecutar la aplicación se mostrará la información de todos los trabajos alojados en el servidor.  
 
-##3. OPCIONES DURANTE LA EJECUCION DE LA APLICACION##
+##3. OPCIONES DURANTE LA EJECUCION DE LA APLICACION
 
 La aplicación cuenta con teclas especiales que pueden ser utilizadas durante la ejecución de ésta.  
 q:  
