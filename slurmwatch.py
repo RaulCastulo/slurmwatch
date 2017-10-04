@@ -31,7 +31,7 @@ if(args.R):
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else: 
-            salida = commands.getoutput("ssh a.raco python ./squeue/running.py")
+            salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     elif(args.R and args.tPD):
@@ -60,7 +60,7 @@ else:
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else: 
-            salida = commands.getoutput("python ./squeue/running.py")
+            salida = commands.getoutput("python ./slurmwatch/running.py")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     elif(args.tPD):
@@ -81,7 +81,7 @@ else:
         num_lineas = str(len(salida.splitlines())-2)
         lista_salida = salida.splitlines()[1:]
     if(len(lista_salida) <= 1):
-        ayuda = commands.getoutput("python ./squeue.py -h")
+        ayuda = commands.getoutput("python slurmwatch.py -h")
         sys.stdout.write("Es necesario que agregues el parametro \"-R\" para ejecutar el script de manera remota"+'\n')
         sys.stdout.write('\n'+ayuda+'\n')
         quit()
@@ -484,9 +484,9 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco python ./squeue/running.py "+usuario)
+	        salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py "+usuario)
             else:
-	        salida = commands.getoutput("python ./squeue/running.py "+usuario)
+	        salida = commands.getoutput("python running.py "+usuario)
 	    num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
             cursor_x = 0
@@ -501,9 +501,9 @@ def crear_pantalla(stdscr):
         
 	elif(k == ord('R')):
 	    if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco python ./squeue/running.py")
+	        salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py")
             else:
-	        salida = commands.getoutput("python ./squeue/running.py")
+	        salida = commands.getoutput("python running.py")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
             cursor_x = 0
