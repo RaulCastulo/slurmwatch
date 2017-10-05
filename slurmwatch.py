@@ -27,7 +27,7 @@ if(args.R):
     remoto = True
     if(args.R and args.tR):
         if(args.username):
-            salida = commands.getoutput("ssh a.raco squeue -l -tR -u "+args.username)
+            salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py "+args._username)
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else: 
@@ -56,11 +56,11 @@ else:
     remoto = False
     if(args.tR):
         if(args.username):
-            salida = commands.getoutput("squeue -l -tR -u "+args.username)
+            salida = commands.getoutput("python running.py "+args._username)
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else: 
-            salida = commands.getoutput("python ./slurmwatch/running.py")
+            salida = commands.getoutput("python /running.py")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     elif(args.tPD):
