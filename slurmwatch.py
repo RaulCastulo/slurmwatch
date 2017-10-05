@@ -27,7 +27,7 @@ if(args.R):
     remoto = True
     if(args.R and args.tR):
         if(args.username):
-            salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py "+args._username)
+            salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py "+args.username)
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else: 
@@ -56,7 +56,7 @@ else:
     remoto = False
     if(args.tR):
         if(args.username):
-            salida = commands.getoutput("python running.py "+args._username)
+            salida = commands.getoutput("python running.py "+args.username)
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else: 
