@@ -15,6 +15,18 @@ global num_lineas
 global lista_salida
 global remoto
 global administrador
+
+
+# Vamos a validar si tenemos acceso remoto a alguna de las cuentas de administrador
+cuentas = commands.getoutput("cat ~/.ssh/config")
+if(cuentas.find("a.raco") != -1):
+    administrador = "a.raco"
+elif(cuentas.find("yoltla") != -1):
+    administrador = "yoltla"
+else:
+    terminar()
+    sys.stdout.write("NO CUENTAS CON PERMISOS DE ADMINISTRADOR\n")
+
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
 parser.add_argument("-R", action="store_true", help="Permite ejecutar este script de manera remota")
@@ -26,12 +38,6 @@ parser.add_argument("-tPD", action="store_true", help="Muestra todos los trabajo
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
 
-# Vamos a validar si tenemos acceso remoto a alguna de las cuentas de administrador
-cuentas = commands.getoutput("cat ~/.ssh/config")
-if(cuentas.find("a.raco") != -1):
-    administrador = "a.raco"
-else:
-    administrador = "yoltla"
 
 # Validamos los casos posibles al recibir parametros para indicar que hacer en cada caso
 #Validamos que parametros se recibieron para la ejecucion remota del script
@@ -332,7 +338,7 @@ def desplegar_ayuda(stdscr):
     stdscr.refresh()
     while (k != ord('q')):
         linea1 = "    Nota: "
-        linea2 = "En esta version la palicacion debe de ser ejecutada con la terminal en pantalla completa"
+        linea2 = "En esta version la aplicacion debe de ser ejecutada con la terminal en pantalla completa"
         linea3 = " q: Salir de la pantalla actual o salir del programa"
         linea4 = " h: Muestra esta pantalla de ayuda"
         linea5 = " R: Despliega la informacion de todos los trabajos que estan en ejecucion"
