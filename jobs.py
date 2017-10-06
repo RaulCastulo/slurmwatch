@@ -21,6 +21,36 @@ def ajustar_output(output):
         valores.append(i)
     return valores
 
+def obtener_carga(nodes):
+
+    output = commands.getoutput("scontrol show nodes "+nodes+" | grep CPULoad")
+    valores_loadtemp = output.splitlines()
+    #print output
+
+    valores_load = []
+    #Guardamos en una lista la lista que contiene los valores de CPUAlloc, CPUTot, CPULoad
+    for i in valores_loadtemp:
+        valores_load.append(i.split())
+    
+    Cores = 0
+    Usados = 0
+    Carga = 0
+    Eff = 0
+    secuencia1 = "CPUTot="
+    secuencia2 = "CPUAlloc="
+    secuencia3 = "CPULoad="
+
+    #REcuperamos solo la parte numerica de CPUAlloc, CPUTot, CPULoad
+    for i in valores_load:
+        Cores += int(i[2].lstrip(secuencia1))
+        Usados += int(i[0].lstrip(secuencia2))
+        Carga += float(i[3].lstrip(secuencia3))
+
+    Eff = (Carga/Usados)*100
+    #print "Cores: "+str(Cores)+" Usados: "+str(Usados)+" Carga: "+str(Carga)+" %Eff: "+str(int(Eff))
+    return Cores, Usados,int(Carga), int(Eff)
+
+
 def agregar_columns_output(output):
     cores = 0
     enuso = 0
@@ -89,34 +119,6 @@ def agregar_colum_output(output):
 
     return aux
 
-def obtener_carga(nodes):
-
-    output = commands.getoutput("scontrol show nodes "+nodes+" | grep CPULoad")
-    valores_loadtemp = output.splitlines()
-    #print output
-
-    valores_load = []
-    #Guardamos en una lista la lista que contiene los valores de CPUAlloc, CPUTot, CPULoad
-    for i in valores_loadtemp:
-        valores_load.append(i.split())
-    
-    Cores = 0
-    Usados = 0
-    Carga = 0
-    Eff = 0
-    secuencia1 = "CPUTot="
-    secuencia2 = "CPUAlloc="
-    secuencia3 = "CPULoad="
-
-    #REcuperamos solo la parte numerica de CPUAlloc, CPUTot, CPULoad
-    for i in valores_load:
-        Cores += int(i[2].lstrip(secuencia1))
-        Usados += int(i[0].lstrip(secuencia2))
-        Carga += float(i[3].lstrip(secuencia3))
-
-    Eff = (Carga/Usados)*100
-    #print "Cores: "+str(Cores)+" Usados: "+str(Usados)+" Carga: "+str(Carga)+" %Eff: "+str(int(Eff))
-    return Cores, Usados,int(Carga), int(Eff)
 
 
 
