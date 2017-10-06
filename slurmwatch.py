@@ -5,6 +5,10 @@ import sys
 import os
 import argparse
 
+"""
+Esta version tendra una mejora para conectarse remotamente
+"""
+
 # Variables en donde se guardara la informacion que se obtiene de ejecutar los comandos
 global salida  
 global num_lineas
