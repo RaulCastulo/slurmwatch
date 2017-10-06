@@ -18,14 +18,16 @@ global administrador
 
 
 # Vamos a validar si tenemos acceso remoto a alguna de las cuentas de administrador
-cuentas = commands.getoutput("cat ~/.ssh/config")
-if(cuentas.find("a.raco") != -1):
-    administrador = "a.raco"
-elif(cuentas.find("yoltla") != -1):
+cuentas = commands.getoutput("cat ~/.ssh/config") 
+
+if(cuentas.find("yoltla") != -1):
     administrador = "yoltla"
+elif(cuentas.find("a.raco") != -1):
+    administrador = "a.raco"
 else:
-    terminar()
-    sys.stdout.write("NO CUENTAS CON PERMISOS DE ADMINISTRADOR\n")
+    sys.stdout.write("NO CUENTAS CON ACCESO COMO ADMINISTRADOR\n")
+    quit()
+
 
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
