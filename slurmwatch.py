@@ -14,6 +14,7 @@ global salida
 global num_lineas
 global lista_salida
 global remoto
+global administrador
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
 parser.add_argument("-R", action="store_true", help="Permite ejecutar este script de manera remota")
@@ -25,34 +26,41 @@ parser.add_argument("-tPD", action="store_true", help="Muestra todos los trabajo
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
 
+# Vamos a validar si tenemos acceso remoto a alguna de las cuentas de administrador
+cuentas = commands.getoutput("cat ~/.ssh/config")
+if(cuentas.find("a.raco") != -1):
+    administrador = "a.raco"
+else:
+    administrador = "yoltla"
+
 # Validamos los casos posibles al recibir parametros para indicar que hacer en cada caso
 #Validamos que parametros se recibieron para la ejecucion remota del script
 if(args.R):
     remoto = True
     if(args.R and args.tR):
         if(args.username):
-            salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py "+args.username)
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py "+args.username)
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else: 
-            salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py")
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     elif(args.R and args.tPD):
         if(args.username):
-            salida = commands.getoutput("ssh a.raco squeue -l -tPD -u "+args.username)
+            salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD -u "+args.username)
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
         else:
-            salida = commands.getoutput("ssh a.raco squeue -l -tPD")
+            salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD")
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
     elif(args.username):
-            salida = commands.getoutput("ssh a.raco squeue -l -u "+args.username)
+            salida = commands.getoutput("ssh "+administrador+" squeue -l -u "+args.username)
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
     else:
-        salida = commands.getoutput("ssh a.raco squeue -l")
+        salida = commands.getoutput("ssh "+administrador+" squeue -l")
         num_lineas = str(len(salida.splitlines())-2)
         lista_salida = salida.splitlines()[1:]
 #Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
@@ -412,6 +420,8 @@ def crear_pantalla(stdscr):
     global num_lineas
     global salida
     global remoto
+    global administrador
+
     inicializar_curses(stdscr, cursor_y, cursor_x) 
     
     #Capturamos cada linea que contiene la variable salida en un arreglo
@@ -468,7 +478,7 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l -u "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l -u "+usuario)
             else:
 	        salida = commands.getoutput("squeue -l -u  "+usuario)
             num_lineas = str(len(salida.splitlines())-2)
@@ -488,7 +498,7 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py "+usuario)
             else:
 	        salida = commands.getoutput("python running.py "+usuario)
 	    num_lineas = str(len(salida.splitlines())-1)
@@ -505,7 +515,7 @@ def crear_pantalla(stdscr):
         
 	elif(k == ord('R')):
 	    if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py")
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py")
             else:
 	        salida = commands.getoutput("python running.py")
             num_lineas = str(len(salida.splitlines())-1)
@@ -517,7 +527,7 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l -tPD -u "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD -u "+usuario)
             else:
 	        salida = commands.getoutput("squeue -l -tPD -u "+usuario)
             num_lineas = str(len(salida.splitlines())-2)
@@ -531,7 +541,7 @@ def crear_pantalla(stdscr):
     	    finlinea = width - 1
         elif(k == ord('P')):
             if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l -tPD ")
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD ")
             else:
 	        salida = commands.getoutput("squeue -l -tPD ")
             num_lineas = str(len(salida.splitlines())-2)
@@ -547,7 +557,7 @@ def crear_pantalla(stdscr):
     	    finlinea = width - 1
         elif(k == ord('l')):
             if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l")
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l")
             else:
 	        salida = commands.getoutput("squeue -l ")
             num_lineas = str(len(salida.splitlines())-2)
