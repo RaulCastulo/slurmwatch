@@ -6,7 +6,8 @@ import os
 
 global lista_salida
 global num_lineas
-trabajos = commands.getoutput("python jobs.py pgarcia")
+usuario = sys.argv[1]
+trabajos = commands.getoutput("python jobs.py "+usuario)
 lista_salida = trabajos.splitlines()
 num_lineas = len(lista_salida) - 1 
 if(num_lineas == 0):
