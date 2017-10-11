@@ -73,7 +73,15 @@ def agregar_columns_output(output):
 	
     aux.sort(key=itemgetter(3), reverse=True)
     return aux
+def agregar_columnas_trabajos_pendientes(pendientes):
+    pendientes = ajustar_output(pendientes)
+    columnas = ["---", "---", "---", "---"]
+    columnas.extend(pendientes)
+    return columnas
 
+def agregar_trabajos_pendientes(output, pendientes):
+    aux = output.extend(pendientes)
+    return aux
 
 def agregar_colum_output(output):
     cores = 0
@@ -124,17 +132,19 @@ def agregar_colum_output(output):
 
 
 cabecera = "CORES INUSE LOAD  %EFF  JOBID       PARTITION   NAME        USER        STATE     TIME        TIME_LIMI   NODES NODELIST(REASON)"
-#cabecera = "CORES INUSE LOAD  %EFF  JOBID     PARTITION     NAME       USER         ST TIME     NODES NODELIST(REASON)"
-usuario = ""
-if(len(sys.argv)>1):
-    usuario = sys.argv[1]    
-    output = commands.getoutput("squeue -h -l -tR -u "+usuario)
-else:
-    output = commands.getoutput("squeue -h -l -tR")
+#usuario = ""
+#if(len(sys.argv)>1):
+usuario = sys.argv[1]    
+output = commands.getoutput("squeue -h -l -tR -u "+usuario)
+pendientes = commands.getoutput("squeue -h -l -tP -u "+usuario)
+#else:
+#   output = commands.getoutput("squeue -h -l -tR")
+#   pendietes = commands.getoutput("squeue -h -l -tP")
 
 output = ajustar_output(output)
+pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 output = agregar_columns_output(output)
-
+output = agregar_trabajos_pendientes(output, pendientes)
 print cabecera
 for j in output:
     cadena = "%-6s%-6s%-6s%-6s%-12s%-12s%-12s%-12s%-10s%-12s%-13s%-5s%-12s" %  (str(j[0]), str(j[1]), str(j[2]), str(j[3]), j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])  
