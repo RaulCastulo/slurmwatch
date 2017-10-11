@@ -4,6 +4,17 @@ import commands
 import sys
 import os
 
+global lista_salida
+global num_lineas
+trabajos = commands.getoutput("python jobs.py pgarcia")
+lista_salida = trabajos.splitlines()
+num_lineas = len(lista_salida) - 1 
+if(num_lineas == 0):
+    quit()
+    sys.stdout.write("ACTUALMENTE NO CUENTAS CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
+else:
+    num_lineas = str(num_lineas)
+    #lista_salida = trabajos.splitlines()[1:]
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
 
@@ -318,6 +329,7 @@ def crear_pantalla_htop(stdscr, nodo):
     curses.endwin()
 
 def crear_pantalla(stdscr):
+    global lista_salida
     k = 0 
     cursor_x = 0
     cursor_y = 1
@@ -331,7 +343,8 @@ def crear_pantalla(stdscr):
     finlinea = width - 1
 
     #Diccionario que contiene la informacion de teclas especiales
-    info_barra_inf = {1:" q ",2:"Salir",3:" Enter ", 4: "Ver Trabajo", 5:" w ", 6:"Top", 7:" e ", 8:"pstree", 9:" u ", 10:"squeue -u", 11:" p ", 12:"squeue -tPD -u", 13:" r ", 14:"squeue -tR -u", 15:" R ", 16:"squeue -tR", 17:" P ", 18:"squeue -tPD", 19:" l ", 20:"squeue -l",21:" t ", 22:"less", 23:" h ", 24:"Ayuda"}
+    #info_barra_inf = {1:" q ",2:"Salir",3:" Enter ", 4: "Ver Trabajo", 5:" w ", 6:"Top", 7:" e ", 8:"pstree", 9:" u ", 10:"squeue -u", 11:" p ", 12:"squeue -tPD -u", 13:" r ", 14:"squeue -tR -u", 15:" R ", 16:"squeue -tR", 17:" P ", 18:"squeue -tPD", 19:" l ", 20:"squeue -l",21:" t ", 22:"less", 23:" h ", 24:"Ayuda"}
+    info_barra_inf = {1:" q ",2:"Salir",3:" h ", 4: "Ayuda"}
     
     while (k != ord('q')):
 
@@ -340,12 +353,10 @@ def crear_pantalla(stdscr):
         k = stdscr.getch()
         if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
             cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida) 
+        elif(k == ord('h')):
+            desplegar_ayuda(stdscr)
         """
         elif(k == ord("\n")):
-            """
-               Queda pendiente validar esta funcion para su ejecucion de forma remota
-               en esta version solo funciona en forma local como administrador
-            """
             #Recuperamos la informacion de la linea en la que actualmente estael cursor
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             #Guardamos cada una de las cadenas que contiene la linea en un arreglo
@@ -354,19 +365,11 @@ def crear_pantalla(stdscr):
     	    salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
             crear_subpantalla(stdscr, salida)
         elif(k == ord('w')):
-            """
-               Queda pendiente validar esta funcion para su ejecucion de forma remota
-               en esta version solo funciona en forma local como administrador
-            """
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             datos = linea.split()
 	    nodo = validar_nodo(datos[-1])
 	    crear_pantalla_htop(stdscr, nodo)
         elif(k == ord('e')):
-            """
-               Queda pendiente validar esta funcion para su ejecucion de forma remota
-               en esta version solo funciona en forma local como administrador
-            """
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             datos =  linea.split()
 	    usr = datos[-6]
@@ -394,6 +397,7 @@ def crear_pantalla(stdscr):
             salida = commands.getoutput("less ./running.py")
             crear_subpantalla(stdscr, salida)
         """
+	"""
         elif(k == ord('r')):
 	    salida = commands.getoutput("python running.py "+usuario)
 	    num_lineas = str(len(salida.splitlines())-1)
@@ -408,6 +412,7 @@ def crear_pantalla(stdscr):
     	    inilinea = 0
     	    finlinea = width - 1
         """
+	"""
 	elif(k == ord('R')):
 	    if(remoto == True):
 	        salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py")
@@ -418,6 +423,7 @@ def crear_pantalla(stdscr):
             cursor_x = 0
             cursor_y = 1
         """
+	"""
 	elif(k == ord('p')):
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             datos = linea.split()
@@ -436,6 +442,7 @@ def crear_pantalla(stdscr):
     	    inilinea = 0
     	    finlinea = width - 1
         """
+	"""
         elif(k == ord('P')):
             if(remoto == True):
 	        salida = commands.getoutput("ssh a.raco squeue -l -tPD ")
@@ -469,8 +476,6 @@ def crear_pantalla(stdscr):
     	    inilinea = 0
     	    finlinea = width - 1
 	"""
-        elif(k == ord('h')):
-            desplegar_ayuda(stdscr)
         
 	
  
