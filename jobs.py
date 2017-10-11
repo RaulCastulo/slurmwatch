@@ -95,10 +95,10 @@ pendientes = commands.getoutput("squeue -h -l -tPD -u "+usuario)
 
 print cabecera
 
-if(len(ejecucion.splitlines()) > 0):
+if(len(ejecucion.splitlines()) > 0 and ejecucion.find("Invalid user") == -1):
     	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
 	imprimir(ejecucion)
-if(len(pendientes.splitlines()) > 0):
+if(len(pendientes.splitlines()) > 0 and  pendientes.find("Invalid user") == -1):
 	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
         imprimir(pendientes)
 
