@@ -50,13 +50,15 @@ def obtener_carga(nodes):
     return Cores, Usados,int(Carga), int(Eff)
 
 
-def agregar_columns_output(output):
+def agregar_columnas_trabajos_ejecucion(output):
     cores = 0
     enuso = 0
     carga = 0
     eff = 0
     aux = []
-    auxfin = []
+    
+    output = ajustar_output(output)
+    
     for i in output:
         valores = []
         valores_output = i.split()
@@ -87,16 +89,15 @@ def agregar_columnas_trabajos_pendientes(pendientes):
 cabecera = "CORES INUSE LOAD  %EFF  JOBID         PARTITION   NAME        USER        STATE     TIME        TIME_LIMI   NODES NODELIST(REASON)"
 
 usuario = sys.argv[1]    
-output = commands.getoutput("squeue -h -l -tR -u "+usuario)
+ejecucion = commands.getoutput("squeue -h -l -tR -u "+usuario)
 pendientes = commands.getoutput("squeue -h -l -tPD -u "+usuario)
 
 
 print cabecera
 
-if(len(output.splitlines()) > 0):
-	output = ajustar_output(output)
-	output = agregar_columns_output(output)
-	imprimir(output)
+if(len(ejecucion.splitlines()) > 0):
+    	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+	imprimir(ejecucion)
 if(len(pendientes.splitlines()) > 0):
 	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
         imprimir(pendientes)
