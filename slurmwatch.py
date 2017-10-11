@@ -11,8 +11,8 @@ trabajos = commands.getoutput("python jobs.py "+usuario)
 lista_salida = trabajos.splitlines()
 num_lineas = len(lista_salida) - 1 
 if(num_lineas == 0):
+    sys.stdout.write("\tACTUALMENTE EL USUARIO "+usuario+" NO CUENTA CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
     quit()
-    sys.stdout.write("ACTUALMENTE NO CUENTAS CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
 else:
     num_lineas = str(num_lineas)
     #lista_salida = trabajos.splitlines()[1:]
