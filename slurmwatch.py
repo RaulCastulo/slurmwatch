@@ -148,8 +148,8 @@ def desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nli
     #Agregamos la cabecera a la pantalla
     cabecera = lista_salida[0]
     stdscr.attron(curses.color_pair(3))
-    stdscr.addstr(0, 0, cabecera)
-    stdscr.addstr(0, len(cabecera), " " * (width - len(cabecera)-1))
+    stdscr.addstr(0, 0, cabecera[inilinea:finlinea])
+    stdscr.addstr(0, len(cabecera[inilinea:finlinea]), " " * (width - len(cabecera[inilinea:finlinea])-1))
     stdscr.attroff(curses.color_pair(3))
     #Capturamos los datos del diccionario en una variable
     barra = ""
@@ -329,7 +329,6 @@ def crear_pantalla(stdscr):
     finlinea = width - 1
 
     #Diccionario que contiene la informacion de teclas especiales
-    #info_barra_inf = {1:" q ",2:"Salir",3:" Enter ", 4: "Ver Trabajo", 5:" w ", 6:"Top", 7:" e ", 8:"pstree", 9:" u ", 10:"squeue -u", 11:" p ", 12:"squeue -tPD -u", 13:" r ", 14:"squeue -tR -u", 15:" R ", 16:"squeue -tR", 17:" P ", 18:"squeue -tPD", 19:" l ", 20:"squeue -l",21:" t ", 22:"less", 23:" h ", 24:"Ayuda"}
     info_barra_inf = {1:" q ",2:"Salir",3:" h ", 4: "Ayuda"}
     
     while (k != ord('q')):
@@ -341,143 +340,21 @@ def crear_pantalla(stdscr):
             cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida) 
         elif(k == ord('h')):
             desplegar_ayuda(stdscr)
-        """
-        elif(k == ord("\n")):
-            #Recuperamos la informacion de la linea en la que actualmente estael cursor
-            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-            #Guardamos cada una de las cadenas que contiene la linea en un arreglo
-            datos = linea.split()
-	    jobid = datos[-9]
-    	    salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
-            crear_subpantalla(stdscr, salida)
-        elif(k == ord('w')):
-            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-            datos = linea.split()
-	    nodo = validar_nodo(datos[-1])
-	    crear_pantalla_htop(stdscr, nodo)
-        elif(k == ord('e')):
-            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-            datos =  linea.split()
-	    usr = datos[-6]
-	    nodo = validar_nodo(datos[-1])
-	    salida = commands.getoutput("ssh "+nodo+" pstree -u "+usr+" -plac")
-            crear_subpantalla(stdscr, salida)
-        elif(k == ord('u')):
-            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-            datos = linea.split()
-            usuario = datos[-6]
-            if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l -u "+usuario)
-            else:
-	        salida = commands.getoutput("squeue -l -u  "+usuario)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
-            cursor_x = 0
-            cursor_y = 1
-    	    height, width = stdscr.getmaxyx()
-    	    nlineasup = 1
-    	    nlineainf = height - 1 
-    	    inilinea = 0
-    	    finlinea = width - 1
-        elif(k == ord('t')):
-            salida = commands.getoutput("less ./running.py")
-            crear_subpantalla(stdscr, salida)
-        """
-	"""
-        elif(k == ord('r')):
-	    salida = commands.getoutput("python running.py "+usuario)
-	    num_lineas = str(len(salida.splitlines())-1)
-            lista_salida = salida.splitlines()
-            cursor_x = 0
-            cursor_y = 1
-    	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
-	    # a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
-	    height, width = stdscr.getmaxyx()
-    	    nlineasup = 1
-    	    nlineainf = height - 1 
-    	    inilinea = 0
-    	    finlinea = width - 1
-        """
-	"""
-	elif(k == ord('R')):
-	    if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco python ./slurmwatch/running.py")
-            else:
-	        salida = commands.getoutput("python running.py")
-            num_lineas = str(len(salida.splitlines())-1)
-            lista_salida = salida.splitlines()
-            cursor_x = 0
-            cursor_y = 1
-        """
-	"""
-	elif(k == ord('p')):
-            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-            datos = linea.split()
-            usuario = datos[-6]
-            if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l -tPD -u "+usuario)
-            else:
-	        salida = commands.getoutput("squeue -l -tPD -u "+usuario)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
-            cursor_x = 0
-            cursor_y = 1
-    	    height, width = stdscr.getmaxyx()
-    	    nlineasup = 1
-    	    nlineainf = height - 1 
-    	    inilinea = 0
-    	    finlinea = width - 1
-        """
-	"""
-        elif(k == ord('P')):
-            if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l -tPD ")
-            else:
-	        salida = commands.getoutput("squeue -l -tPD ")
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
-            cursor_x = 0
-            cursor_y = 1
-    	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
-	    # a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
-	    height, width = stdscr.getmaxyx()
-    	    nlineasup = 1
-    	    nlineainf = height - 1 
-    	    inilinea = 0
-    	    finlinea = width - 1
-        elif(k == ord('l')):
-            if(remoto == True):
-	        salida = commands.getoutput("ssh a.raco squeue -l")
-            else:
-	        salida = commands.getoutput("squeue -l ")
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
-            cursor_x = 0
-            cursor_y = 1
-    	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
-	    # a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
-	    height, width = stdscr.getmaxyx()
-    	    nlineasup = 1
-    	    nlineainf = height - 1 
-    	    inilinea = 0
-    	    finlinea = width - 1
-	"""
-        
 	
  
 def main():
     stdscr = curses.initscr()
     height, width = stdscr.getmaxyx()
-    if(height >= 20 and width >= 117):
+    if(height >= 20 and width >= 132):
         curses.wrapper(crear_pantalla)
     else:
-        if(height < 20 and width < 117):
+        if(height < 20 and width < 132):
             terminar()
             sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA MAS AMPLIA"+'\n')
-        if(height >= 20 and width < 117):
+        if(height >= 20 and width < 132):
             terminar()
             sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA CON MAS COLUMNAS"+'\n')
-        if(height < 20 and width >= 117):
+        if(height < 20 and width >= 132):
             terminar()
             sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA CON MAS RENGLONES"+'\n')
 if __name__ == "__main__":
