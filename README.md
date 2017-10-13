@@ -13,7 +13,7 @@ La aplicación permite desplegar a través de una terminal la información obten
 La aplicación contempla el uso de parámetros al momento de su ejecución, los parámetros que acepta y la explicación de la información que éstos muestran se describe a continuación: 
 
 -R  
-    Permite ejecutar la aplicación y consultar la información de forma remota en el servidor.  
+:	Permite ejecutar la aplicación y consultar la información de forma remota en el servidor.  
 
 -u USERNAME, --username USERNAME  
     Muestra la información de todos los trabajos del usuario <USERNAME>  
@@ -22,10 +22,10 @@ La aplicación contempla el uso de parámetros al momento de su ejecución, los 
  	Muestra la información de los trabajos que se encuentran en ejecución.  
 
 -tPD  
-:    Muestra la información de los trabajos pendientes.  
+     Muestra la información de los trabajos pendientes.  
 
 -h  
-:    Muestra una breve ayuda sobre los parametros que acepta la aplicacion.  
+     Muestra una breve ayuda sobre los parametros que acepta la aplicacion.  
 
 
 En caso de que no se utilicen parametros al ejecutar la aplicación se mostrará la información de todos los trabajos alojados en el servidor.  
