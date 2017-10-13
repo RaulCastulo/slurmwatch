@@ -11,20 +11,35 @@ global num_lineas
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usuario <username>")
+parser.add_argument("-a", action="store_true", help="Muestra todos los trabajos")
+
+
 
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
 
 if(args.username):
-    trabajos = commands.getoutput("python jobs.py "+args.username)
-    lista_salida = trabajos.splitlines()
-    num_lineas = len(lista_salida) - 1 
+	if(args.a):
+		user_id = commands.getoutput("id -u "+args.username)
+		if(user_id > 5000 and user_id < 6000):
+			info_user = commands.getoutput("cat /etc/passwd | grep "+args.username+" | awk '{ print $1 }'")
+			info_user = info_user.split()
+			users = []
+			for i in info_user:
+			    aux = i.split(":")
+				users.append(aux[0])
+    	else:
+			
+	else:
+		trabajos = commands.getoutput("python jobs.py "+args.username)
+    	lista_salida = trabajos.splitlines()
+    	num_lineas = len(lista_salida) - 1 
         
-    if(num_lineas == 0):
-	sys.stdout.write("\tACTUALMENTE EL USUARIO "+args.username+" NO CUENTA CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
-        quit()
-    else:
-        num_lineas = str(num_lineas)
+    	if(num_lineas == 0):
+			sys.stdout.write("\tACTUALMENTE EL USUARIO "+args.username+" NO CUENTA CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
+        	quit()
+    	else:
+        	num_lineas = str(num_lineas)
 	
 else: 
     ayuda = commands.getoutput("python slurmwatch.py -h")
