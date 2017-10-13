@@ -3,20 +3,35 @@ import curses
 import commands
 import sys
 import os
+import argparse
 
 global lista_salida
 global num_lineas
-usuario = sys.argv[1]
-trabajos = commands.getoutput("python jobs.py "+usuario)
-lista_salida = trabajos.splitlines()
-num_lineas = len(lista_salida) - 1 
-if(num_lineas == 0):
-    sys.stdout.write("\tACTUALMENTE EL USUARIO "+usuario+" NO CUENTA CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
-    quit()
-else:
-    num_lineas = str(num_lineas)
-    #lista_salida = trabajos.splitlines()[1:]
 
+# Manejo de parametros que puede recibir al ejecutar el script
+parser = argparse.ArgumentParser()
+parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usuario <username>")
+
+# Obtenemos los parametros que puede recibir el script
+args = parser.parse_args()
+
+if(args.username):
+    trabajos = commands.getoutput("python jobs.py "+args.username)
+    lista_salida = trabajos.splitlines()
+    num_lineas = len(lista_salida) - 1 
+        
+    if(num_lineas == 0):
+	sys.stdout.write("\tACTUALMENTE EL USUARIO "+args.username+" NO CUENTA CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
+        quit()
+    else:
+        num_lineas = str(num_lineas)
+	
+else: 
+    ayuda = commands.getoutput("python slurmwatch.py -h")
+    sys.stdout.write("Es necesario especificar el nombre de usuario"+'\n')
+    sys.stdout.write('\n'+ayuda+'\n')
+    quit()
+ 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
 
     height, width = stdscr.getmaxyx()
