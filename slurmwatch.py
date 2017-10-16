@@ -27,28 +27,26 @@ if(args.username):
 			info_user = info_user.split()
 			users = []
 			for i in info_user:
-			    aux = i.split(":")
+				aux = i.split(":")
 				users.append(aux[0])
-    	else:
-			trabajos = commands.getoutput("python jobs.py "+args.username)
 			
-	else:
-		trabajos = commands.getoutput("python jobs.py "+args.username)
-    	lista_salida = trabajos.splitlines()
-    	num_lineas = len(lista_salida) - 1 
-        
-    	if(num_lineas == 0):
-			sys.stdout.write("\tACTUALMENTE EL USUARIO "+args.username+" NO CUENTA CON TRABAJOS ALOJADOS EN EL SERVIDOR"+"\n")
-        	quit()
-    	else:
-        	num_lineas = str(num_lineas)
-	
+			userss = " ".join(users)
+			trabajos = commands.getoutput("python jobs.py "+userss)
+    		lista_salida = trabajos.splitlines()
+    		num_lineas = str(len(lista_salida) - 1)
+
 else: 
     ayuda = commands.getoutput("python slurmwatch.py -h")
     sys.stdout.write("Es necesario especificar el nombre de usuario"+'\n')
     sys.stdout.write('\n'+ayuda+'\n')
     quit()
- 
+			
+
+
+
+
+
+
 def inicializar_curses(stdscr, cursor_y, cursor_x):
 
     height, width = stdscr.getmaxyx()
