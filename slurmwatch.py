@@ -20,6 +20,7 @@ args = parser.parse_args()
 
 if(args.username):
 	if(args.a):
+		# Validamos si el usuario es investigador para poder mostrar la informacion de los trabajos de sus colaboradores y alumnos
 		user_id = commands.getoutput("id -u "+args.username)
 		if(user_id > 5000 and user_id < 6000):
 			info_user = commands.getoutput("cat /etc/passwd | grep "+args.username+" | awk '{ print $1 }'")
@@ -29,6 +30,7 @@ if(args.username):
 			    aux = i.split(":")
 				users.append(aux[0])
     	else:
+			trabajos = commands.getoutput("python jobs.py "+args.username)
 			
 	else:
 		trabajos = commands.getoutput("python jobs.py "+args.username)
