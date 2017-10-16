@@ -3,9 +3,6 @@ import commands
 from operator import itemgetter
 
 
-def imprime(lista):
-	for i in lista:
-		print i
 
 def imprimir(lista):
     for j in lista:
@@ -16,10 +13,8 @@ def ajustar_output(output):
    
     #Quitamos los espacios en blanco que aparecen al principio de las cadenas
     
-    #valorestemp = output.splitlines()
     valores = []
     
-    #for i in valorestemp:
     for i in output:
         i = i.strip()
         valores.append(i)
@@ -100,39 +95,13 @@ for i in range(1, num_args):
 	ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+sys.argv[i])).splitlines())
 	pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+sys.argv[i])).splitlines())
 	
-	"""
-	trabajos_ejecucion = commands.getoutput("squeue -h -l -tR -u "+sys.argv[i])
-	trabajos_pendientes = commands.getoutput("squeue -h -l -tPD -u "+sys.argv[i])
-	
-	if(len(trabajos_ejecucion) > 0):
-		ejecucion += trabajos_ejecucion
-	if(len(trabajos_pendientes) > 0):
-		pendientes += trabajos_pendientes
-	"""
 print cabecera
 
 if(len(ejecucion) > 0):
 	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
 	imprimir(ejecucion)
-	#imprime(ejecucion)
 
 if(len(pendientes) > 0):
 	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 	imprimir(pendientes)
-	#imprime(pendientes)
 
-"""
-usuario = sys.argv[1]    
-ejecucion = commands.getoutput("squeue -h -l -tR -u "+usuario)
-pendientes = commands.getoutput("squeue -h -l -tPD -u "+usuario)
-
-
-print cabecera
-
-if(len(ejecucion.splitlines()) > 0 and ejecucion.find("Invalid user") == -1):
-    	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-	imprimir(ejecucion)
-if(len(pendientes.splitlines()) > 0 and  pendientes.find("Invalid user") == -1):
-	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-        imprimir(pendientes)
-"""
