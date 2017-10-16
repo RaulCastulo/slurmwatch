@@ -3,6 +3,10 @@ import commands
 from operator import itemgetter
 
 
+def imprime(lista):
+	for i in lista:
+		print i
+
 def imprimir(lista):
     for j in lista:
         cadena = "%-6s%-6s%-6s%-6s%-14s%-12s%-12s%-12s%-10s%-12s%-13s%-5s%-12s" %  (str(j[0]), str(j[1]), str(j[2]), str(j[3]), j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])  
@@ -12,10 +16,11 @@ def ajustar_output(output):
    
     #Quitamos los espacios en blanco que aparecen al principio de las cadenas
     
-    valorestemp = output.splitlines()
+    #valorestemp = output.splitlines()
     valores = []
     
-    for i in valorestemp:
+    #for i in valorestemp:
+    for i in output:
         i = i.strip()
         valores.append(i)
     return valores
@@ -86,8 +91,37 @@ def agregar_columnas_trabajos_pendientes(pendientes):
     return aux
 
 
-cabecera = "CORES INUSE LOAD  %EFF  JOBID         PARTITION   NAME        USER        STATE     TIME        TIME_LIMI   NODES NODELIST(REASON)"
+cabecera = "CORES INUSE LOAD  %EFF  JOBID         PARTITION   NAME        USER        STATE     TIME        TIME_LIMIT  NODES NODELIST(REASON)"
 
+num_args = len(sys.argv)
+ejecucion = []
+pendientes = []
+for i in range(1, num_args):
+	ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+sys.argv[i])).splitlines())
+	pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+sys.argv[i])).splitlines())
+	
+	"""
+	trabajos_ejecucion = commands.getoutput("squeue -h -l -tR -u "+sys.argv[i])
+	trabajos_pendientes = commands.getoutput("squeue -h -l -tPD -u "+sys.argv[i])
+	
+	if(len(trabajos_ejecucion) > 0):
+		ejecucion += trabajos_ejecucion
+	if(len(trabajos_pendientes) > 0):
+		pendientes += trabajos_pendientes
+	"""
+print cabecera
+
+if(len(ejecucion) > 0):
+	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+	imprimir(ejecucion)
+	#imprime(ejecucion)
+
+if(len(pendientes) > 0):
+	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+	imprimir(pendientes)
+	#imprime(pendientes)
+
+"""
 usuario = sys.argv[1]    
 ejecucion = commands.getoutput("squeue -h -l -tR -u "+usuario)
 pendientes = commands.getoutput("squeue -h -l -tPD -u "+usuario)
@@ -101,4 +135,4 @@ if(len(ejecucion.splitlines()) > 0 and ejecucion.find("Invalid user") == -1):
 if(len(pendientes.splitlines()) > 0 and  pendientes.find("Invalid user") == -1):
 	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
         imprimir(pendientes)
-
+"""
