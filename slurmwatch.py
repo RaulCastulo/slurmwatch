@@ -19,22 +19,9 @@ parser.add_argument("-a", action="store_true", help="Muestra todos los trabajos"
 args = parser.parse_args()
 
 if(args.username):
-	if(args.a):
-		# Validamos si el usuario es investigador para poder mostrar la informacion de los trabajos de sus colaboradores y alumnos
-		user_id = commands.getoutput("id -u "+args.username)
-		if(user_id > 5000 and user_id < 6000):
-			info_user = commands.getoutput("cat /etc/passwd | grep "+args.username+" | awk '{ print $1 }'")
-			info_user = info_user.split()
-			users = []
-			for i in info_user:
-				aux = i.split(":")
-				users.append(aux[0])
-			
-			userss = " ".join(users)
-			trabajos = commands.getoutput("python jobs.py "+userss)
-    		lista_salida = trabajos.splitlines()
-    		num_lineas = str(len(lista_salida) - 1)
-
+	trabajos = commands.getoutput("python jobs.py "+args.username)
+	lista_salida = trabajos.splitlines()
+	num_lineas = str(len(lista_salida) - 1)
 else: 
     ayuda = commands.getoutput("python slurmwatch.py -h")
     sys.stdout.write("Es necesario especificar el nombre de usuario"+'\n')
@@ -42,10 +29,16 @@ else:
     quit()
 			
 
-
-
-
-
+def obtener_usuarios(investigador):
+	info_user = commands.getoutput("cat /etc/passwd | grep "+investigador+" | awk '{ print $1 }'")
+	info_user = info_user.split()
+	users = []
+	for i in info_user:
+		aux = i.split(":")
+		users.append(aux[0])
+			
+	usuarios = " ".join(users)
+	return usuarios
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
 
@@ -153,8 +146,8 @@ def sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, in
 
 
 def desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf):
-    #height, width = stdscr.getmaxyx()
-    nlinea = 1
+	#height, width = stdscr.getmaxyx()
+	nlinea = 1
     stdscr.clear()
     stdscr.refresh()
          
@@ -230,30 +223,6 @@ def terminar():
     curses.echo()
     curses.endwin()
 
-def validar_nodo(nodos):
-    #Recuperamos el tercer caracter de la cadena para despues validar
-    c = nodos[2]
-    nodo = ""
-
-    if(c == '['):
-	# Si el tercer caracter de la cadena es [ entonces tenemos que
-	# recuperar el nombre del primer nodo en base a la cadena 
-	inicio = 3
-	fin = len(nodos)
-	nodo = nodos[:2]
-	numero = ""
-	
-	for i in range(inicio, fin):
-	    caracter = nodos[i]
-	    if((caracter == '-') or (caracter == ',')):
-		break
-	    else:
-		numero += caracter
-	nodo += numero
-    else:
-	nodo = nodos
-    
-    return nodo
 
 def obtener_linea(list_salida, no_linea):
     contador = 1
@@ -294,40 +263,7 @@ def desplegar_ayuda(stdscr):
          
         k = stdscr.getch()
 
-def crear_subpantalla(stdscr, salida):
-    k = 0 
-    cursor_x = 0
-    cursor_y = 1
-    
-    inicializar_curses(stdscr, cursor_y, cursor_x) 
-    
-    info_barra_inf = {1:" q ",2:" Salir ",3:" h ", 4:" Ayuda "}
-    lista_salida = salida.splitlines()
-    height, width = stdscr.getmaxyx()
-    nlineasup = 1
-    nlineainf = height - 1 #para tomar las lineas que podemos mostrar 
-    inilinea = 0
-    finlinea = width - 1
-    
-    while (k != ord('q')):
-        desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
 
-        # Esperamos a que se teclee una opcion
-        k = stdscr.getch()
-        if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
-            cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida) 
-        elif(k == ord('h')):
-            desplegar_ayuda(stdscr)
-
-def crear_pantalla_htop(stdscr, nodo):
-    k = 0
-    stdscr.clear()
-    stdscr.refresh()
-    
-    while(k != ord('q')):
-        os.system("ssh -t "+nodo+" top -id1")
-        k = 113
-    curses.endwin()
 
 def crear_pantalla(stdscr):
     global lista_salida
