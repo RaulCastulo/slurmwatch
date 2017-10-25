@@ -5,8 +5,20 @@ import sys
 import os
 import argparse
 
-global lista_salida
-global num_lineas
+lista_salida = ""
+num_lineas = ""
+
+def obtener_usuarios(investigador):
+    info_user = commands.getoutput("cat /etc/passwd | grep "+investigador+" | awk '{ print $1 }'")
+    info_user = info_user.split()
+    users = []
+    for i in info_user:
+        aux = i.split(":")
+        users.append(aux[0])
+        
+    usuarios = " ".join(users)
+    return usuarios
+
 
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
@@ -19,27 +31,28 @@ parser.add_argument("-a", action="store_true", help="Muestra todos los trabajos"
 args = parser.parse_args()
 
 if(args.username):
-	trabajos = commands.getoutput("python jobs.py "+args.username)
-	lista_salida = trabajos.splitlines()
-	num_lineas = str(len(lista_salida) - 1)
+    if(args.a):
+        user_id = commands.getoutput("id -u "+args.username)
+        if( (5000 < user_id) and (user_id < 6000)):
+            users = obtener_usuarios(args.username)
+            trabajos = commands.getoutput("python jobs.py "+users)
+            lista_salida = trabajos.splitlines()
+            num_lineas = str(len(lista_salida) - 1)
+"""       
+		else:
+            trabajos = commands.getoutput("python jobs.py "+args.username)
+            lista_salida = trabajos.splitlines()
+            num_lineas = str(len(lista_salida) - 1)	
+	else:
+        trabajos = commands.getoutput("python jobs.py "+args.username)
+        lista_salida = trabajos.splitlines()
+        num_lineas = str(len(lista_salida) - 1)
 else: 
     ayuda = commands.getoutput("python slurmwatch.py -h")
     sys.stdout.write("Es necesario especificar el nombre de usuario"+'\n')
     sys.stdout.write('\n'+ayuda+'\n')
     quit()
-			
-
-def obtener_usuarios(investigador):
-	info_user = commands.getoutput("cat /etc/passwd | grep "+investigador+" | awk '{ print $1 }'")
-	info_user = info_user.split()
-	users = []
-	for i in info_user:
-		aux = i.split(":")
-		users.append(aux[0])
-			
-	usuarios = " ".join(users)
-	return usuarios
-
+"""			
 def inicializar_curses(stdscr, cursor_y, cursor_x):
 
     height, width = stdscr.getmaxyx()
@@ -148,36 +161,35 @@ def sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, in
 def desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf):
 	#height, width = stdscr.getmaxyx()
 	nlinea = 1
-    stdscr.clear()
-    stdscr.refresh()
-         
-    lineas_en_pantalla = lista_salida[nlineasup:nlineainf]
+	stdscr.clear()
+	stdscr.refresh()
+	lineas_en_pantalla = lista_salida[nlineasup:nlineainf]
     
     #Agregamos la cabecera a la pantalla
-    cabecera = lista_salida[0]
-    stdscr.attron(curses.color_pair(3))
-    stdscr.addstr(0, 0, cabecera[inilinea:finlinea])
-    stdscr.addstr(0, len(cabecera[inilinea:finlinea]), " " * (width - len(cabecera[inilinea:finlinea])-1))
-    stdscr.attroff(curses.color_pair(3))
-    #Capturamos los datos del diccionario en una variable
-    barra = ""
-    for i in info_barra_inf:
-        barra = barra + info_barra_inf[i]
+	cabecera = lista_salida[0]
+	stdscr.attron(curses.color_pair(3))
+	stdscr.addstr(0, 0, cabecera[inilinea:finlinea])
+	stdscr.addstr(0, len(cabecera[inilinea:finlinea]), " " * (width - len(cabecera[inilinea:finlinea])-1))
+	stdscr.attroff(curses.color_pair(3))
+	#Capturamos los datos del diccionario en una variable
+	barra = ""
+	for i in info_barra_inf:
+		barra = barra + info_barra_inf[i]
     
     #Agregamos la ultima linea de la pantalla que contiene informacion
-    #sobre las teclas especiales
-    inicio = 0
-    fin = 0    
-    for i in info_barra_inf:
-        fin = fin + len(info_barra_inf[i])
-        if(i%2 != 0):
-            stdscr.attron(curses.color_pair(2))
-            stdscr.addstr(height-1, inicio, barra[inicio:fin])
-            stdscr.attroff(curses.color_pair(2))
-        else: 
-            stdscr.attron(curses.color_pair(3))
-            stdscr.addstr(height-1, inicio, barra[inicio:fin])
-            stdscr.attroff(curses.color_pair(3))
+    #sobre las teclas especiale
+	inicio = 0
+	fin = 0    
+	for i in info_barra_inf:
+		fin = fin + len(info_barra_inf[i])
+		if(i%2 != 0):
+			stdscr.attron(curses.color_pair(2))
+			stdscr.addstr(height-1, inicio, barra[inicio:fin])
+			stdscr.attroff(curses.color_pair(2))
+		else: 
+			stdscr.attron(curses.color_pair(3))
+			stdscr.addstr(height-1, inicio, barra[inicio:fin])
+			stdscr.attroff(curses.color_pair(3))
                 
         if(i == len(info_barra_inf)):
             stdscr.attron(curses.color_pair(3))
@@ -191,102 +203,100 @@ def desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nli
         inicio = inicio + len(info_barra_inf[i])
    
 
-    if(height > len(lineas_en_pantalla)): 
-        for i in lineas_en_pantalla:
-            stdscr.addstr(nlinea, 0, i[inilinea:finlinea])
-            nlinea = nlinea + 1
-    else:
-        
-        for i in lineas_en_pantalla:
-            stdscr.addstr(nlinea, 0,i[inilinea:finlinea])
-            nlinea = nlinea + 1
-            if(nlinea == height-1):
-                nlineainf = height - 1 
-                break
+	if(height > len(lineas_en_pantalla)):
+		for i in lineas_en_pantalla:
+			stdscr.addstr(nlinea, 0, i[inilinea:finlinea])
+			nlinea = nlinea + 1
+	else:
+		for i in lineas_en_pantalla:
+			stdscr.addstr(nlinea, 0,i[inilinea:finlinea])
+			nlinea = nlinea + 1
+			if(nlinea == height-1):
+				nlineainf = height - 1 
+				break
    
     #Establecemos el fondo de la linea en donde actualmente esta el cursor 
-    linea = obtener_linea(lineas_en_pantalla, cursor_y)
-    stdscr.attron(curses.color_pair(1))
-    stdscr.addstr(cursor_y, 0, linea[inilinea:finlinea])
-    if(len(linea[inilinea:finlinea]) <= width):
-        stdscr.addstr(cursor_y, len(linea[inilinea:finlinea]), " " * (width - len(linea[inilinea:finlinea])-1))
-    else:
-        stdscr.addstr(cursor_y, 0," " * (width - 1)) 
-    stdscr.attroff(curses.color_pair(1))
+	linea = obtener_linea(lineas_en_pantalla, cursor_y)
+	stdscr.attron(curses.color_pair(1))
+	stdscr.addstr(cursor_y, 0, linea[inilinea:finlinea])
+	if(len(linea[inilinea:finlinea]) <= width):
+		stdscr.addstr(cursor_y, len(linea[inilinea:finlinea]), " " * (width - len(linea[inilinea:finlinea])-1))
+	else:
+		stdscr.addstr(cursor_y, 0," " * (width - 1)) 
+	stdscr.attroff(curses.color_pair(1))
     
-    stdscr.move(cursor_y, cursor_x)
-    stdscr.refresh()       
+	stdscr.move(cursor_y, cursor_x)
+	stdscr.refresh()       
     
 
 def terminar():
-    curses.nocbreak()
-    curses.echo()
-    curses.endwin()
+	curses.nocbreak()
+	curses.echo()
+	curses.endwin()
 
 
 def obtener_linea(list_salida, no_linea):
-    contador = 1
-    linea = " "
-    for i in list_salida: 
-        if(contador == no_linea):
-            linea = i
-        contador = contador + 1
-    return linea
+	contador = 1
+	linea = " "
+	for i in list_salida: 
+		if(contador == no_linea):
+			linea = i
+		contador = contador + 1
+	return linea
 
 def recuperar_linea(lista_salida, no_linea, nlineasup, nlineainf):
-    contador = 1
-    linea = " "
-    for i in range(nlineasup,nlineainf):
-        if(contador == no_linea):
-            linea = lista_salida[i]
-        contador = contador + 1
-    return linea
+	contador = 1
+	linea = " "
+	for i in range(nlineasup,nlineainf):
+		if(contador == no_linea):
+			linea = lista_salida[i]
+		contador = contador + 1
+	return linea
 
 def desplegar_ayuda(stdscr):
 
-    k = 0
-    stdscr.clear()
-    stdscr.refresh()
+	k = 0
+	stdscr.clear()
+	stdscr.refresh()
     
-    info_ayuda = {1:"\tq:", 2:"\t\tSalir de la pantalla actual o salir del programa", 3:"\th:", 4: "\t\tMuesta esta pantalla de ayuda"}
-    cont_y = 5
+	info_ayuda = {1:"\tq:", 2:"\t\tSalir de la pantalla actual o salir del programa", 3:"\th:", 4: "\t\tMuesta esta pantalla de ayuda"}
+	cont_y = 5
     
-    while (k != ord('q')):
-    
-        for i in info_ayuda:
-            if(i%2 != 0):
-        	stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(6))
-		cont_y += 1
-            else: 
-        	stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(5))
-                cont_y += 1 
+	while (k != ord('q')):
+		for i in info_ayuda:
+			if(i%2 != 0):
+				stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(6))
+				cont_y += 1
+			else: 
+				stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(5))
+				cont_y += 1 
          
-        k = stdscr.getch()
+		k = stdscr.getch()
 
 
 
 def crear_pantalla(stdscr):
-    global lista_salida
-    k = 0 
-    cursor_x = 0
-    cursor_y = 1
-    inicializar_curses(stdscr, cursor_y, cursor_x) 
+	global lista_salida
+	k = 0 
+	cursor_x = 0
+	cursor_y = 1
+	inicializar_curses(stdscr, cursor_y, cursor_x) 
     
-    #Capturamos cada linea que contiene la variable salida en un arreglo
-    height, width = stdscr.getmaxyx()
-    nlineasup = 1
-    nlineainf = height - 1 
-    inilinea = 0
-    finlinea = width - 1
+	#Capturamos cada linea que contiene la variable salida en un arreglo
+	height, width = stdscr.getmaxyx()
+	nlineasup = 1
+	nlineainf = height - 1 
+	inilinea = 0
+	finlinea = width - 1
 
-    #Diccionario que contiene la informacion de teclas especiales
-    info_barra_inf = {1:" q ",2:"Salir",3:" h ", 4: "Ayuda"}
+	#Diccionario que contiene la informacion de teclas especiales
+	info_barra_inf = {1:" q ",2:"Salir",3:" h ", 4: "Ayuda"}
     
-    while (k != ord('q')):
+	while (k != ord('q')):
 
-        desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
+		desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
         
-        k = stdscr.getch()
+		k = stdscr.getch()
         if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
             cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida) 
         elif(k == ord('h')):
