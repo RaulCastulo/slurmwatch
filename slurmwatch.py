@@ -9,17 +9,21 @@ import argparse
 global salida  
 global num_lineas
 global lista_salida
+global remoto
+global administrador
 
-def obtener_usuarios(investigador):
-    info_user = commands.getoutput("cat /etc/passwd | grep "+investigador+" | awk '{ print $1 }'")
-    info_user = info_user.split()
-    users = []
-    for i in info_user:
-        aux = i.split(":")
-        users.append(aux[0])
-        
-    usuarios = " ".join(users)
-    return usuarios
+
+# Vamos a validar si tenemos acceso remoto a alguna de las cuentas de administrador
+cuentas = commands.getoutput("cat ~/.ssh/config") 
+
+if(cuentas.find("yoltla") != -1):
+    administrador = "yoltla"
+elif(cuentas.find("a.raco") != -1):
+    administrador = "a.raco"
+else:
+    sys.stdout.write("NO CUENTAS CON ACCESO COMO ADMINISTRADOR\n")
+    quit()
+
 
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
@@ -34,14 +38,69 @@ args = parser.parse_args()
 
 # Validamos los casos posibles al recibir parametros para indicar que hacer en cada caso
 #Validamos que parametros se recibieron para la ejecucion remota del script
+if(args.R):
+    remoto = True
+    if(args.R and args.tR):
+        if(args.username):
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py "+args.username)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+        else: 
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+    elif(args.R and args.tPD):
+        if(args.username):
+            salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+        else:
+            salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD")
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+    elif(args.username):
+            salida = commands.getoutput("ssh "+administrador+" squeue -l -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+    else:
+        salida = commands.getoutput("ssh "+administrador+" squeue -l")
+        num_lineas = str(len(salida.splitlines())-2)
+        lista_salida = salida.splitlines()[1:]
+#Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
+else:
+    remoto = False
+    if(args.tR):
+        if(args.username):
+            salida = commands.getoutput("python running.py "+args.username)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+        else: 
+            salida = commands.getoutput("python running.py")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+    elif(args.tPD):
+        if(args.username):
+            salida = commands.getoutput("squeue -l -tPD -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+        else:
+            salida = commands.getoutput("squeue -l -tPD")
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+    elif(args.username):
+            salida = commands.getoutput("squeue -l -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+    else:
+        salida = commands.getoutput("squeue -l")
+        num_lineas = str(len(salida.splitlines())-2)
+        lista_salida = salida.splitlines()[1:]
+    if(len(lista_salida) <= 1):
+        ayuda = commands.getoutput("python slurmwatch.py -h")
+        sys.stdout.write("Es necesario que agregues el parametro \"-R\" para ejecutar el script de manera remota"+'\n')
+        sys.stdout.write('\n'+ayuda+'\n')
+        quit()
 
-if(args.R and args.username):
-    user_id = commands.getoutput("id -u "+args.username)
-    if( (5000 < user_id) and (user_id < 6000)):
-        users = obtener_usuarios(args.username)
-        trabajos = commands.getoutput("python jobs.py "+users)
-        lista_salida = trabajos.splitlines()
-        num_lineas = str(len(lista_salida) - 1)
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
 
@@ -226,6 +285,31 @@ def terminar():
     curses.echo()
     curses.endwin()
 
+def validar_nodo(nodos):
+    #Recuperamos el tercer caracter de la cadena para despues validar
+    c = nodos[2]
+    nodo = ""
+
+    if(c == '['):
+	# Si el tercer caracter de la cadena es [ entonces tenemos que
+	# recuperar el nombre del primer nodo en base a la cadena 
+	inicio = 3
+	fin = len(nodos)
+	nodo = nodos[:2]
+	numero = ""
+	
+	for i in range(inicio, fin):
+	    caracter = nodos[i]
+	    if((caracter == '-') or (caracter == ',')):
+		break
+	    else:
+		numero += caracter
+	nodo += numero
+    else:
+	nodo = nodos
+    
+    return nodo
+
 def obtener_linea(list_salida, no_linea):
     contador = 1
     linea = " "
@@ -245,24 +329,91 @@ def recuperar_linea(lista_salida, no_linea, nlineasup, nlineainf):
     return linea
 
 def desplegar_ayuda(stdscr):
+
+    k = 0
+    stdscr.clear()
+    stdscr.refresh()
+    while (k != ord('q')):
+        linea1 = "    Nota: "
+        linea2 = "En esta version la palicacion debe de ser ejecutada con la terminal en pantalla completa"
+        linea3 = " q: Salir de la pantalla actual o salir del programa"
+        linea4 = " h: Muestra esta pantalla de ayuda"
+        linea5 = " R: Despliega la informacion de todos los trabajos que estan en ejecucion"
+        linea6 = " P: Despliega la informacion de todos los trabajos pendientes"
+        linea7 = " l: Despliega la informacion de todos los trabajos que estan alojados en el servidor"
+        linea8 = "Las siguientes opciones toman informacion de la linea que actualmente esta seleccionada y realizan lo siguiente"
+        linea9 = " Enter:  Permite visualizar informacion acerca del trabajo"
+        linea10 = " w: Permite hacer una conexion por ssh al nodo y hacer top"
+        linea11 = " e: Se contecta por ssh al nodo y ejecuta pstree con el usuaraio que esta utilizando el nodo"
+        linea12 = " u: Muestra la informacion de todos los trabajos del usuario"
+        linea13 = " p: Muestra la informacion de todos los trabajos pendientes del usuario"
+        linea14 = " r: Muestra la informacion de todos los trabajos en enjecucion del usuario"
+
+        #stdscr.attron(curses.color_pair(4))
+        stdscr.addstr(1, 0, linea1, curses.color_pair(4))
+        stdscr.addstr(2, 0, linea2, curses.color_pair(5))
+        stdscr.addstr(5,0, linea3[0:3], curses.color_pair(6))
+        stdscr.addstr(5,3, linea3[3:], curses.color_pair(5))
+        stdscr.addstr(6,0, linea4[0:3], curses.color_pair(6))
+        stdscr.addstr(6,3, linea4[3:], curses.color_pair(5))
+        stdscr.addstr(7,0, linea5[0:3], curses.color_pair(6))
+        stdscr.addstr(7,3, linea5[3:], curses.color_pair(5))
+        stdscr.addstr(8,0, linea6[0:3], curses.color_pair(6))
+        stdscr.addstr(8,3, linea6[3:], curses.color_pair(5))
+        stdscr.addstr(9,0, linea7[0:3], curses.color_pair(6))
+        stdscr.addstr(9,3, linea7[3:], curses.color_pair(5))
+        stdscr.addstr(11, 0, linea8, curses.color_pair(5))
+        stdscr.addstr(13,0, linea9[0:7], curses.color_pair(6))
+        stdscr.addstr(13,7, linea9[7:], curses.color_pair(5))
+        stdscr.addstr(14,0, linea10[0:3], curses.color_pair(6))
+        stdscr.addstr(14,3, linea10[3:], curses.color_pair(5))
+        stdscr.addstr(15,0, linea11[0:3], curses.color_pair(6))
+        stdscr.addstr(15,3, linea11[3:], curses.color_pair(5))
+        stdscr.addstr(16,0, linea12[0:3], curses.color_pair(6))
+        stdscr.addstr(16,3, linea12[3:], curses.color_pair(5))
+        stdscr.addstr(17,0, linea13[0:3], curses.color_pair(6))
+        stdscr.addstr(17,3, linea13[3:], curses.color_pair(5))
+        stdscr.addstr(18,0, linea14[0:3], curses.color_pair(6))
+        stdscr.addstr(18,3, linea14[3:], curses.color_pair(5))
+        #stdscr.attroff(curses.color_pair(4))
+         
+        k = stdscr.getch()
+
+def crear_subpantalla(stdscr, salida):
+    k = 0 
+    cursor_x = 0
+    cursor_y = 1
+    
+    inicializar_curses(stdscr, cursor_y, cursor_x) 
+    
+    #info_barra_inf = {1:" q ",2:" Salir ",3:" Enter ", 4: " Conectar ", 5:" h ", 6:" Ayuda "}
+    info_barra_inf = {1:" q ",2:" Salir ",3:" h ", 4:" Ayuda "}
+    lista_salida = salida.splitlines()
+    height, width = stdscr.getmaxyx()
+    nlineasup = 1
+    nlineainf = height - 1 #para tomar las lineas que podemos mostrar 
+    inilinea = 0
+    finlinea = width - 1
+    
+    while (k != ord('q')):
+        desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
+
+        # Esperamos a que se teclee una opcion
+        k = stdscr.getch()
+        if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
+            cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida) 
+        elif(k == ord('h')):
+            desplegar_ayuda(stdscr)
+
+def crear_pantalla_htop(stdscr, nodo):
     k = 0
     stdscr.clear()
     stdscr.refresh()
     
-    info_ayuda = {1:"\tq:", 2:"\t\tSalir de la pantalla actual o salir del programa", 3:"\th:", 4: "\t\tMuesta esta pantalla de ayuda"}
-    cont_y = 5
-    
-    while (k != ord('q')):
-        for i in info_ayuda:
-            if(i%2 != 0):
-                stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(6))
-                cont_y += 1
-            else: 
-                stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(5))
-                cont_y += 1 
-         
-        k = stdscr.getch()
-
+    while(k != ord('q')):
+        os.system("ssh -t "+nodo+" top -id1")
+        k = 113
+    curses.endwin()
 
 def crear_pantalla(stdscr):
     k = 0 
@@ -271,6 +422,8 @@ def crear_pantalla(stdscr):
     global lista_salida
     global num_lineas
     global salida
+    global remoto
+    global administrador
     inicializar_curses(stdscr, cursor_y, cursor_x) 
     
     #Capturamos cada linea que contiene la variable salida en un arreglo
@@ -289,8 +442,138 @@ def crear_pantalla(stdscr):
         
         k = stdscr.getch()
         if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
-            cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
-        elif(k == ord('h')):
+            cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida) 
+        elif(k == ord("\n")):
+            """
+               Queda pendiente validar esta funcion para su ejecucion de forma remota
+               en esta version solo funciona en forma local como administrador
+            """
+            #Recuperamos la informacion de la linea en la que actualmente estael cursor
+            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+            #Guardamos cada una de las cadenas que contiene la linea en un arreglo
+            datos = linea.split()
+	    jobid = datos[-9]
+    	    salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
+            crear_subpantalla(stdscr, salida)
+        elif(k == ord('w')):
+            """
+               Queda pendiente validar esta funcion para su ejecucion de forma remota
+               en esta version solo funciona en forma local como administrador
+            """
+            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+            datos = linea.split()
+	    nodo = validar_nodo(datos[-1])
+	    crear_pantalla_htop(stdscr, nodo)
+        elif(k == ord('e')):
+            """
+               Queda pendiente validar esta funcion para su ejecucion de forma remota
+               en esta version solo funciona en forma local como administrador
+            """
+            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+            datos =  linea.split()
+	    usr = datos[-6]
+	    nodo = validar_nodo(datos[-1])
+	    salida = commands.getoutput("ssh "+nodo+" pstree -u "+usr+" -plac")
+            crear_subpantalla(stdscr, salida)
+        elif(k == ord('u')):
+            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+            datos = linea.split()
+            usuario = datos[-6]
+            if(remoto == True):
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l -u "+usuario)
+            else:
+	        salida = commands.getoutput("squeue -l -u  "+usuario)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+            cursor_x = 0
+            cursor_y = 1
+    	    height, width = stdscr.getmaxyx()
+    	    nlineasup = 1
+    	    nlineainf = height - 1 
+    	    inilinea = 0
+    	    finlinea = width - 1
+        elif(k == ord('t')):
+            salida = commands.getoutput("less ./running.py")
+            crear_subpantalla(stdscr, salida)
+        elif(k == ord('r')):
+            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+            datos = linea.split()
+            usuario = datos[-6]
+            if(remoto == True):
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py "+usuario)
+            else:
+	        salida = commands.getoutput("python running.py "+usuario)
+	    num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+            cursor_x = 0
+            cursor_y = 1
+    	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
+	    # a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
+	    height, width = stdscr.getmaxyx()
+    	    nlineasup = 1
+    	    nlineainf = height - 1 
+    	    inilinea = 0
+    	    finlinea = width - 1
+        
+	elif(k == ord('R')):
+	    if(remoto == True):
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py")
+            else:
+	        salida = commands.getoutput("python running.py")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+            cursor_x = 0
+            cursor_y = 1
+	elif(k == ord('p')):
+            linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+            datos = linea.split()
+            usuario = datos[-6]
+            if(remoto == True):
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD -u "+usuario)
+            else:
+	        salida = commands.getoutput("squeue -l -tPD -u "+usuario)
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+            cursor_x = 0
+            cursor_y = 1
+    	    height, width = stdscr.getmaxyx()
+    	    nlineasup = 1
+    	    nlineainf = height - 1 
+    	    inilinea = 0
+    	    finlinea = width - 1
+        elif(k == ord('P')):
+            if(remoto == True):
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD ")
+            else:
+	        salida = commands.getoutput("squeue -l -tPD ")
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+            cursor_x = 0
+            cursor_y = 1
+    	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
+	    # a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
+	    height, width = stdscr.getmaxyx()
+    	    nlineasup = 1
+    	    nlineainf = height - 1 
+    	    inilinea = 0
+    	    finlinea = width - 1
+        elif(k == ord('l')):
+            if(remoto == True):
+	        salida = commands.getoutput("ssh "+administrador+" squeue -l")
+            else:
+	        salida = commands.getoutput("squeue -l ")
+            num_lineas = str(len(salida.splitlines())-2)
+            lista_salida = salida.splitlines()[1:]
+            cursor_x = 0
+            cursor_y = 1
+    	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
+	    # a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
+	    height, width = stdscr.getmaxyx()
+    	    nlineasup = 1
+    	    nlineainf = height - 1 
+    	    inilinea = 0
+    	    finlinea = width - 1
+	elif(k == ord('h')):
             desplegar_ayuda(stdscr)
         
 	
@@ -312,5 +595,3 @@ def main():
             sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA CON MAS RENGLONES"+'\n')
 if __name__ == "__main__":
     main()
-
-
