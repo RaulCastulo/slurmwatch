@@ -24,6 +24,16 @@ else:
     sys.stdout.write("NO CUENTAS CON ACCESO COMO ADMINISTRADOR\n")
     quit()
 
+def obtener_usuarios(investigador):
+	info_user = commands.getoutput("cat /etc/passwd | grep "+investigador+" | awk '{ print $1 }'")
+	info_user = info_user.split()
+	users = []
+	for i in info_user:
+		aux = i.split(":")
+		users.append(aux[0])
+		
+	usuarios = " ".join(users)
+	return usuarios
 
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
@@ -70,14 +80,11 @@ if(args.R):
 else:
     remoto = False
     if(args.tR):
-        if(args.username):
-            salida = commands.getoutput("python running.py "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
-        else: 
-            salida = commands.getoutput("python running.py")
-            num_lineas = str(len(salida.splitlines())-1)
-            lista_salida = salida.splitlines()
+        if(args.username):				
+			usuarios = obtener_usuarios(args.username)
+			salida = commands.getoutput("python jobs.py "+usuarios)
+			num_lineas = str(len(salida.splitlines())-1)
+			lista_salida = salida.splitlines()
     elif(args.tPD):
         if(args.username):
             salida = commands.getoutput("squeue -l -tPD -u "+args.username)
@@ -88,9 +95,9 @@ else:
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
     elif(args.username):
-            salida = commands.getoutput("squeue -l -u "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("python jobs.py "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
     else:
         salida = commands.getoutput("squeue -l")
         num_lineas = str(len(salida.splitlines())-2)
@@ -502,7 +509,7 @@ def crear_pantalla(stdscr):
             if(remoto == True):
 	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py "+usuario)
             else:
-	        salida = commands.getoutput("python running.py "+usuario)
+	        salida = commands.getoutput("python jobs.py "+usuario)
 	    num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
             cursor_x = 0
@@ -519,7 +526,7 @@ def crear_pantalla(stdscr):
 	    if(remoto == True):
 	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py")
             else:
-	        salida = commands.getoutput("python running.py")
+	        salida = commands.getoutput("python jobs.py")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
             cursor_x = 0
