@@ -34,7 +34,7 @@ def validar_usuario_investigador(usuario):
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usuario <username>")
 parser.add_argument("-A", action="store_true", help="Muestra todos los trabajos")
-
+parser.add_argument("-p", action="store_true", help="Imprime la informacion en la terminal")
 
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
@@ -47,6 +47,10 @@ if(args.username):
 		trabajos = commands.getoutput("python jobs.py "+usuarios)
 		lista_salida = trabajos.splitlines()
 		num_lineas = str(len(lista_salida) - 1)
+	elif(args.p):
+		trabajos = commands.getoutput("python jobs.py "+args.username)
+		sys.stdout.write(trabajos+"\n")
+		quit()
 	else:
 		trabajos = commands.getoutput("python jobs.py "+args.username)
 		lista_salida = trabajos.splitlines()
