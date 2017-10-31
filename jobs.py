@@ -3,11 +3,50 @@ import commands
 from operator import itemgetter
 
 
+#Haremos uso de esta lista para poder almacenar la informacion de los trabajos
+#Esta lista contendra elementos de tipo string para facilitar la impresion en pantalla
+info = []
 
 def imprimir(lista):
-    for j in lista:
-        cadena = "%-6s%-6s%-6s%-6s%-14s%-12s%-12s%-12s%-10s%-12s%-13s%-5s%-12s" %  (str(j[0]), str(j[1]), str(j[2]), str(j[3]), j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])  
-        print cadena
+	for j in lista:
+		lista_aux = []
+		lista_aux.append(str(j[0]))
+		lista_aux.append(str(j[1]))
+		lista_aux.append(str(j[2]))
+		lista_aux.append(str(j[3]))
+		lista_aux.extend(j[4:])
+		cadena = " ".join(lista_aux)
+		print cadena
+
+def imprimir_info(lista):
+	"""
+	En esta variable vamos a almacenar toda la informacion de los trabajos en 
+	una sola cadena para poder hacer echo de esta variable mas adelante.
+	"""
+	aux  = ""
+	for i in lista:
+		aux += i+"\n"
+	return aux
+
+#Metodo que servira para poder agregar elementos a la lista info
+def agregar_info(lista):
+	
+	for j in lista:
+		lista_aux = []
+		"""
+		Hacemos la conversion de tipo int a tipo string para los primeros 4 elementos
+		de la lista que contiene la informacion de los trabajos en ejecucion, ya que los primeros 
+		4 elementos de esta lista son los valores asociados a CORES, INUSE, LOAD, %EFF
+		"""
+		lista_aux.append(str(j[0]))
+		lista_aux.append(str(j[1]))
+		lista_aux.append(str(j[2]))
+		lista_aux.append(str(j[3]))
+		
+		lista_aux.extend(j[4:]) 
+		
+		cadena = " ".join(lista_aux)
+		info.append(cadena)
 
 def ajustar_output(output):
    
@@ -86,8 +125,9 @@ def agregar_columnas_trabajos_pendientes(pendientes):
     return aux
 
 
-cabecera = "CORES INUSE LOAD  %EFF  JOBID         PARTITION   NAME        USER        STATE     TIME        TIME_LIMIT  NODES NODELIST(REASON)"
-
+#cabecera = "CORES INUSE LOAD  %EFF  JOBID         PARTITION   NAME        USER        STATE     TIME        TIME_LIMIT  NODES NODELIST(REASON)"
+cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+info.append(cabecera)
 num_args = len(sys.argv)
 ejecucion = []
 pendientes = []
@@ -95,13 +135,21 @@ for i in range(1, num_args):
 	ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+sys.argv[i])).splitlines())
 	pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+sys.argv[i])).splitlines())
 	
-print cabecera
+#print cabecera
 
 if(len(ejecucion) > 0):
 	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-	imprimir(ejecucion)
+	#imprimir(ejecucion)
+	agregar_info(ejecucion)
 
 if(len(pendientes) > 0):
 	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-	imprimir(pendientes)
+	#imprimir(pendientes)
+	agregar_info(pendientes)
+
+
+datos = imprimir_info(info)
+infor = commands.getoutput('echo '+"'"+datos+"'"+' | column -t')
+
+print infor
 
