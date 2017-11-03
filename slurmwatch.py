@@ -14,9 +14,9 @@ def validar_usuario_investigador(usuario):
 	usuarios = " "
 	id_inferior = 5000
 	id_superior = 6000
-	sys.stdout.write(usuario+"\n")
+	#sys.stdout.write(usuario+"\n")
 	user_id = int(commands.getoutput("id -u "+usuario))
-	sys.stdout.write(str(user_id)+"\n")
+	#sys.stdout.write(str(user_id)+"\n")
 	if((id_inferior < user_id) and (user_id < id_superior)):
 		info_user = commands.getoutput("cat /etc/passwd | grep "+usuario+" | awk '{ print $1 }'")
 		info_user = info_user.split()
@@ -25,7 +25,7 @@ def validar_usuario_investigador(usuario):
 			aux = i.split(":")
 			users.append(aux[0])
 		usuarios = " ".join(users)
-		sys.stdout.write(usuarios+"\n")
+		#sys.stdout.write(usuarios+"\n")
 	else:
 		usuarios = usuario
 	return usuarios
@@ -45,8 +45,12 @@ if(args.username):
 	if(args.A):
 		usuarios = validar_usuario_investigador(args.username)
 		trabajos = commands.getoutput("python jobs.py "+usuarios)
-		lista_salida = trabajos.splitlines()
-		num_lineas = str(len(lista_salida) - 1)
+		if(args.p):
+			sys.stdout.write(trabajos+"\n")
+			quit()
+		else:
+			lista_salida = trabajos.splitlines()
+			num_lineas = str(len(lista_salida) - 1)
 	elif(args.p):
 		trabajos = commands.getoutput("python jobs.py "+args.username)
 		sys.stdout.write(trabajos+"\n")
