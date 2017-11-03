@@ -85,7 +85,7 @@ def obtener_carga(nodes):
     if(Usados != 0):
     	Eff = (Carga/Usados)*100
     else:
-	Eff = 0
+		Eff = 0
     return Cores, Usados,int(Carga), int(Eff)
 
 
