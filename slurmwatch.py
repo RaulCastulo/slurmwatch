@@ -594,6 +594,8 @@ def main():
             terminar()
             sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA CON MAS RENGLONES"+'\n')
 if __name__ == "__main__":
-    main()
-
-
+	#Capturamos la excepcion generada por Ctrl+C para terminar correctamente el programa
+	try:
+		main()
+	except KeyboardInterrupt:
+		terminar()
