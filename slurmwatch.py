@@ -313,8 +313,6 @@ def crear_pantalla(stdscr):
         k = stdscr.getch()
         if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
             cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
-        elif(k == ord('h')):
-            desplegar_ayuda(stdscr)
         
 	
  
@@ -333,7 +331,13 @@ def main():
         if(height < 20 and width >= 132):
             terminar()
             sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA CON MAS RENGLONES"+'\n')
-if __name__ == "__main__":
-    main()
 
+if __name__ == "__main__":
+	"""
+	
+	"""
+	try:
+		main()
+	except KeyboardInterrupt:
+		terminar()
 
