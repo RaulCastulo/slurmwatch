@@ -7,16 +7,6 @@ from operator import itemgetter
 #Esta lista contendra elementos de tipo string para facilitar la impresion en pantalla
 info = []
 
-def imprimir(lista):
-	for j in lista:
-		lista_aux = []
-		lista_aux.append(str(j[0]))
-		lista_aux.append(str(j[1]))
-		lista_aux.append(str(j[2]))
-		lista_aux.append(str(j[3]))
-		lista_aux.extend(j[4:])
-		cadena = " ".join(lista_aux)
-		print cadena
 
 def imprimir_info(lista):
 	"""
@@ -125,31 +115,28 @@ def agregar_columnas_trabajos_pendientes(pendientes):
     return aux
 
 
-#cabecera = "CORES INUSE LOAD  %EFF  JOBID         PARTITION   NAME        USER        STATE     TIME        TIME_LIMIT  NODES NODELIST(REASON)"
 cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
 info.append(cabecera)
+
 num_args = len(sys.argv)
 ejecucion = []
 pendientes = []
+
 for i in range(1, num_args):
 	ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+sys.argv[i])).splitlines())
 	pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+sys.argv[i])).splitlines())
 	
-#print cabecera
 
 if(len(ejecucion) > 0):
 	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-	#imprimir(ejecucion)
 	agregar_info(ejecucion)
 
 if(len(pendientes) > 0):
 	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-	#imprimir(pendientes)
 	agregar_info(pendientes)
 
 
-datos = imprimir_info(info)
-infor = commands.getoutput('echo '+"'"+datos+"'"+' | column -t')
+trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
 
-print infor
+print trabajos
 
