@@ -24,6 +24,25 @@ else:
     sys.stdout.write("NO CUENTAS CON ACCESO COMO ADMINISTRADOR\n")
     quit()
 
+#En este metodo recuperaremos el nombre de todos los ususarios que tienen trabajos alojados en el servidor
+def obtener_usuarios():
+	#Consultamos todos los trabajos y capturamos en un string solo el nombre del usuario de cada trabajo 
+	usuarios = commands.getoutput("squeue -h -o %u")
+
+	#A partir del string usuarios creamos una lista que contiene cada uno de los nombres de usuario, habra nombres de usuarios repetidos 
+	lista_usuarios = usuarios.splitlines()
+	
+	#Diccionario que ocuparemos para almacenar los nombres de usuario sin nombres de usuario repetidos
+	dict_usuarios = {}
+	
+	#A continuacion agregamos nombres de usuario a dic_usuarios, aseguramos que no halla nombres de usuario repetidos
+	#Y recuperamos los nombres de los usuarios en una lista 
+	usuarios_aux = [dict_usuarios.setdefault(x,x) for x in lista_usuarios if x not in dict_usuarios]
+	
+	#Recuperamos todos los nombres de usuario en una cadena
+	usuarios = " ".join(usuarios_aux)
+
+	return usuarios
 
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
@@ -92,9 +111,11 @@ else:
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
     else:
-        salida = commands.getoutput("squeue -l")
-        num_lineas = str(len(salida.splitlines())-2)
-        lista_salida = salida.splitlines()[1:]
+		usuarios = obtener_usuarios()
+		salida = commands.getoutput("python jobs.py "+usuarios)
+		num_lineas = str(len(salida.splitlines())-1)
+		lista_salida = salida.splitlines()
+
     if(len(lista_salida) <= 1):
         ayuda = commands.getoutput("python slurmwatch.py -h")
         sys.stdout.write("Es necesario que agregues el parametro \"-R\" para ejecutar el script de manera remota"+'\n')
