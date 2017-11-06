@@ -107,9 +107,9 @@ else:
             num_lineas = str(len(salida.splitlines())-2)
             lista_salida = salida.splitlines()[1:]
     elif(args.username):
-            salida = commands.getoutput("squeue -l -u "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("python jobs.py "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
     else:
 		usuarios = obtener_usuarios()
 		salida = commands.getoutput("python jobs.py "+usuarios)
