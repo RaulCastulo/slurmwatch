@@ -524,7 +524,7 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -u "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR -u "+usuario)
             else:
 	        salida = commands.getoutput("python jobs.py -tR -u "+usuario)
 	    num_lineas = str(len(salida.splitlines())-1)
