@@ -27,8 +27,11 @@ else:
 #En este metodo recuperaremos el nombre de todos los ususarios que tienen trabajos alojados en el servidor
 def obtener_usuarios():
 	#Consultamos todos los trabajos y capturamos en un string solo el nombre del usuario de cada trabajo 
-	usuarios = commands.getoutput("squeue -h -o %u")
-
+	if(remoto == True):
+		usuarios = commands.getoutput("ssh "+administrador+"squeue -h -o %u")
+	else:
+		usuarios = commands.getoutput("squeue -h -o %u")
+	
 	#A partir del string usuarios creamos una lista que contiene cada uno de los nombres de usuario, habra nombres de usuarios repetidos 
 	lista_usuarios = usuarios.splitlines()
 	
@@ -61,58 +64,57 @@ if(args.R):
     remoto = True
     if(args.R and args.tR):
         if(args.username):
-            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
         else: 
-            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py")
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     elif(args.R and args.tPD):
         if(args.username):
-            salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD -u "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -tPD -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
         else:
-            salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD")
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -tPD")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
     elif(args.username):
-            salida = commands.getoutput("ssh "+administrador+" squeue -l -u "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
     else:
-        salida = commands.getoutput("ssh "+administrador+" squeue -l")
-        num_lineas = str(len(salida.splitlines())-2)
-        lista_salida = salida.splitlines()[1:]
+		salida = commands.getoutput("ssh "+administrador+"python jobs.py ")
+		num_lineas = str(len(salida.splitlines())-1)
+		lista_salida = salida.splitlines()
 #Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
 else:
     remoto = False
     if(args.tR):
         if(args.username):
-            salida = commands.getoutput("python running.py "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("python jobs.py -tR -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
         else: 
-            salida = commands.getoutput("python running.py")
+            salida = commands.getoutput("python jobs.py -tR")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     elif(args.tPD):
         if(args.username):
-            salida = commands.getoutput("squeue -l -tPD -u "+args.username)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("python jobs.py -tPD -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
         else:
-            salida = commands.getoutput("squeue -l -tPD")
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+            salida = commands.getoutput("python jobs.py -tPD")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
     elif(args.username):
-            salida = commands.getoutput("python jobs.py "+args.username)
+            salida = commands.getoutput("python jobs.py -u "+args.username)
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     else:
-		usuarios = obtener_usuarios()
-		salida = commands.getoutput("python jobs.py "+usuarios)
+		salida = commands.getoutput("python jobs.py ")
 		num_lineas = str(len(salida.splitlines())-1)
 		lista_salida = salida.splitlines()
 
@@ -501,11 +503,11 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+" squeue -l -u "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -u "+usuario)
             else:
-	        salida = commands.getoutput("squeue -l -u  "+usuario)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+	        salida = commands.getoutput("python jobs.py -u "+usuario)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
             cursor_x = 0
             cursor_y = 1
     	    height, width = stdscr.getmaxyx()
@@ -521,9 +523,9 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -u "+usuario)
             else:
-	        salida = commands.getoutput("python running.py "+usuario)
+	        salida = commands.getoutput("python jobs.py -tR -u "+usuario)
 	    num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
             cursor_x = 0
@@ -538,9 +540,9 @@ def crear_pantalla(stdscr):
         
 	elif(k == ord('R')):
 	    if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/running.py")
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR")
             else:
-	        salida = commands.getoutput("python running.py")
+	        salida = commands.getoutput("python jobs.py -tR")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
             cursor_x = 0
@@ -550,11 +552,11 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD -u "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD -u "+usuario)
             else:
-	        salida = commands.getoutput("squeue -l -tPD -u "+usuario)
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+	        salida = commands.getoutput("python jobs.py -tPD -u "+usuario)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
             cursor_x = 0
             cursor_y = 1
     	    height, width = stdscr.getmaxyx()
@@ -564,11 +566,11 @@ def crear_pantalla(stdscr):
     	    finlinea = width - 1
         elif(k == ord('P')):
             if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+" squeue -l -tPD ")
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD")
             else:
-	        salida = commands.getoutput("squeue -l -tPD ")
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
+	        salida = commands.getoutput("python jobs.py	-tPD ")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
             cursor_x = 0
             cursor_y = 1
     	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
@@ -579,21 +581,23 @@ def crear_pantalla(stdscr):
     	    inilinea = 0
     	    finlinea = width - 1
         elif(k == ord('l')):
-            if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+" squeue -l")
-            else:
-	        salida = commands.getoutput("squeue -l ")
-            num_lineas = str(len(salida.splitlines())-2)
-            lista_salida = salida.splitlines()[1:]
-            cursor_x = 0
-            cursor_y = 1
-    	    # Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
-	    # a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
-	    height, width = stdscr.getmaxyx()
-    	    nlineasup = 1
-    	    nlineainf = height - 1 
-    	    inilinea = 0
-    	    finlinea = width - 1
+			usuarios = obtener_usuarios()
+			if(remoto == True):
+				salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py ")
+			else:
+				salida = commands.getoutput("python jobs.py ")
+				num_lineas = str(len(salida.splitlines())-1)
+				lista_salida = salida.splitlines()
+			
+			cursor_x = 0
+			cursor_y = 1
+			#Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
+			#a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
+			height, width = stdscr.getmaxyx()
+			nlineasup = 1
+			nlineainf = height - 1 
+			inilinea = 0
+			finlinea = width - 1
 	elif(k == ord('h')):
             desplegar_ayuda(stdscr)
         
