@@ -16,13 +16,14 @@ global administrador
 # Vamos a validar si tenemos acceso remoto a alguna de las cuentas de administrador
 cuentas = commands.getoutput("cat ~/.ssh/config") 
 
-if(cuentas.find("yoltla") != -1):
-    administrador = "yoltla"
-elif(cuentas.find("a.raco") != -1):
+if(cuentas.find("a.raco") != -1):
     administrador = "a.raco"
+elif(cuentas.find("yoltla") != -1):
+    administrador = "yoltla"
 else:
     sys.stdout.write("NO CUENTAS CON ACCESO COMO ADMINISTRADOR\n")
     quit()
+
 
 #En este metodo recuperaremos el nombre de todos los ususarios que tienen trabajos alojados en el servidor
 def obtener_usuarios():
@@ -586,8 +587,8 @@ def crear_pantalla(stdscr):
 				salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py ")
 			else:
 				salida = commands.getoutput("python jobs.py ")
-				num_lineas = str(len(salida.splitlines())-1)
-				lista_salida = salida.splitlines()
+			num_lineas = str(len(salida.splitlines())-1)
+			lista_salida = salida.splitlines()
 			
 			cursor_x = 0
 			cursor_y = 1
