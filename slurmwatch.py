@@ -73,19 +73,19 @@ if(args.R):
             lista_salida = salida.splitlines()
     elif(args.R and args.tPD):
         if(args.username):
-            salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -tPD -u "+args.username)
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD -u "+args.username)
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
         else:
-            salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -tPD")
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD")
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     elif(args.username):
-            salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -u "+args.username)
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -u "+args.username)
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     else:
-		salida = commands.getoutput("ssh "+administrador+"python jobs.py ")
+		salida = commands.getoutput("ssh "+administrador+" python jobs.py ")
 		num_lineas = str(len(salida.splitlines())-1)
 		lista_salida = salida.splitlines()
 #Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
@@ -503,7 +503,7 @@ def crear_pantalla(stdscr):
             datos = linea.split()
             usuario = datos[-6]
             if(remoto == True):
-	        salida = commands.getoutput("ssh "+administrador+"python ./slurmwatch/jobs.py -u "+usuario)
+	        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -u "+usuario)
             else:
 	        salida = commands.getoutput("python jobs.py -u "+usuario)
             num_lineas = str(len(salida.splitlines())-1)
