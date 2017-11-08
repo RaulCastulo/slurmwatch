@@ -1,6 +1,10 @@
+
+import argparse
 import sys
 import commands
 from operator import itemgetter
+
+
 
 
 #Haremos uso de esta lista para poder almacenar la informacion de los trabajos
@@ -115,26 +119,51 @@ def agregar_columnas_trabajos_pendientes(pendientes):
     return aux
 
 
+#Manejo de parametros que puede recibir el script
+parser = argparse.ArgumentParser()
+parser.add_argument("-u", help="Devulve informacion de los trabajos del/los usuarios")
+parser.add_argument("-tR", action="store_true", help="Devuelve informacion de todos los trabajos en ejecucion")
+parser.add_argument("-tPD", action="store_true", help="Devuelve informacion de todos los trabajos pendientes")
+
+
 cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
 info.append(cabecera)
-
-num_args = len(sys.argv)
 ejecucion = []
 pendientes = []
 
-for i in range(1, num_args):
-	ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+sys.argv[i])).splitlines())
-	pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+sys.argv[i])).splitlines())
-	
+#obtenemos los parametros que puede recibir el script
+args = parser.parse_args()
 
-if(len(ejecucion) > 0):
-	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-	agregar_info(ejecucion)
+#Indicamos que realizar para cada parametro recibido
+if(args.tR):
+	ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
+	if(len(ejecucion) > 0):
+		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+		agregar_info(ejecucion)
+elif(args.tPD):
+	pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
+	if(len(pendientes) > 0):
+		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+		agregar_info(pendientes)
+elif(args.u):
+	#Como todos los nombres de los usuarios los recibiremos en una cadena 
+	#Los guardamos en una lista para solicitar la informacion de los trabajos de cada uno de ellos
+	usuarios =  (args.u).split()
 
-if(len(pendientes) > 0):
-	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-	agregar_info(pendientes)
+	for i in usuarios:
+		ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
+		pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
 
+	if(len(ejecucion) > 0):
+		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+		agregar_info(ejecucion)
+
+	if(len(pendientes) > 0):
+		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+		agregar_info(pendientes)
+else:
+	print "Se requiere nombre de usuarios"
+	quit()
 
 trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
 
