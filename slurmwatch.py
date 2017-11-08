@@ -115,7 +115,7 @@ else:
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     else:
-		salida = commands.getoutput("python jobs.py ")
+		salida = commands.getoutput("python jobs.py -l")
 		num_lineas = str(len(salida.splitlines())-1)
 		lista_salida = salida.splitlines()
 
@@ -586,7 +586,7 @@ def crear_pantalla(stdscr):
 			if(remoto == True):
 				salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py ")
 			else:
-				salida = commands.getoutput("python jobs.py ")
+				salida = commands.getoutput("python jobs.py -l")
 			num_lineas = str(len(salida.splitlines())-1)
 			lista_salida = salida.splitlines()
 			
