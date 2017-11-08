@@ -124,7 +124,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-u", help="Devulve informacion de los trabajos del/los usuarios")
 parser.add_argument("-tR", action="store_true", help="Devuelve informacion de todos los trabajos en ejecucion")
 parser.add_argument("-tPD", action="store_true", help="Devuelve informacion de todos los trabajos pendientes")
-
+parser.add_argument("-l", action="store_true", help="Devuelve la informacion de todos los trabajos")
 
 cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
 info.append(cabecera)
@@ -136,12 +136,18 @@ args = parser.parse_args()
 
 #Indicamos que realizar para cada parametro recibido
 if(args.tR):
-	ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
+	if(args.u):
+		ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+args.u)).splitlines())
+	else:
+		ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
 	if(len(ejecucion) > 0):
 		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
 		agregar_info(ejecucion)
 elif(args.tPD):
-	pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
+	if(args.u):
+		pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+args.u)).splitlines())
+	else:
+		pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
 	if(len(pendientes) > 0):
 		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 		agregar_info(pendientes)
@@ -162,8 +168,15 @@ elif(args.u):
 		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 		agregar_info(pendientes)
 else:
-	print "Se requiere nombre de usuarios"
-	quit()
+	ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
+	pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
+	if(len(ejecucion) > 0):
+		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+		agregar_info(ejecucion)
+
+	if(len(pendientes) > 0):
+		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+		agregar_info(pendientes)
 
 trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
 
