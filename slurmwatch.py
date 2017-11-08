@@ -86,7 +86,7 @@ if(args.R):
             num_lineas = str(len(salida.splitlines())-1)
             lista_salida = salida.splitlines()
     else:
-		salida = commands.getoutput("ssh "+administrador+" python jobs.py ")
+		salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py ")
 		num_lineas = str(len(salida.splitlines())-1)
 		lista_salida = salida.splitlines()
 #Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
