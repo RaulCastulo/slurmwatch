@@ -21,6 +21,12 @@ def imprimir_info(lista):
 	for i in lista:
 		aux += i+"\n"
 	return aux
+def imprime_trabajos(lista):
+	for i in lista:
+		renglon = commands.getoutput('echo '+"'"+i+"'"+' | column -t')
+		print renglon
+		
+
 
 #Metodo que servira para poder agregar elementos a la lista info
 def agregar_info(lista):
@@ -167,18 +173,24 @@ elif(args.u):
 	if(len(pendientes) > 0):
 		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 		agregar_info(pendientes)
-else:
+elif(args.l):
 	ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
 	pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
 	if(len(ejecucion) > 0):
 		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
 		agregar_info(ejecucion)
-
 	if(len(pendientes) > 0):
 		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 		agregar_info(pendientes)
+	
+else:
+	print "agregar parametro nombre de ususario"
+	quit()
 
-trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
 
+#imprime_trabajos(info)
+
+informacion_trabajos = imprimir_info(info)
+trabajos = commands.getoutput('echo '+"'"+informacion_trabajos+"'"+' | column -t')
 print trabajos
 
