@@ -3,7 +3,7 @@ import argparse
 import sys
 import commands
 from operator import itemgetter
-
+import time
 
 
 
@@ -19,12 +19,13 @@ def imprimir_info(lista):
 	"""
 	aux  = ""
 	for i in lista:
-		aux += i+"\n"
+		aux += i+'\n' 
 	return aux
+
 def imprime_trabajos(lista):
 	for i in lista:
-		renglon = commands.getoutput('echo '+"'"+i+"'"+' | column -t')
-		print renglon
+		#renglon = commands.getoutput('echo '+"'"+i+"'"+' | column -t')
+		print i
 		
 
 
@@ -47,6 +48,16 @@ def agregar_info(lista):
 		
 		cadena = " ".join(lista_aux)
 		info.append(cadena)
+
+def agregar_pendientes(pendientes):
+	lista_aux = []
+	for i in pendientes:
+		cadena = " ".join(i)
+		trabajos = commands.getoutput('echo '+"'"+cadena+"'"+' | column -t')
+		print trabajos
+		lista_aux.append(cadena)
+	info.extend(lista_aux)
+
 
 def ajustar_output(output):
    
@@ -118,10 +129,10 @@ def agregar_columnas_trabajos_pendientes(pendientes):
     pendientes = ajustar_output(pendientes)
     aux = []
     for i in pendientes:
-	valores_i = i.split()
-        columnas = ["---", "---", "---", "---"]
-        columnas.extend(valores_i)
-	aux.append(columnas)
+		valores_i = i.split()
+		columnas = ["---", "---", "---", "---"]
+		columnas.extend(valores_i)
+		aux.append(columnas)
     return aux
 
 
@@ -146,17 +157,12 @@ if(args.tR):
 		ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+args.u)).splitlines())
 	else:
 		ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
-	if(len(ejecucion) > 0):
-		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-		agregar_info(ejecucion)
 elif(args.tPD):
 	if(args.u):
 		pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+args.u)).splitlines())
 	else:
 		pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
-	if(len(pendientes) > 0):
-		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-		agregar_info(pendientes)
+		#pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
 elif(args.u):
 	#Como todos los nombres de los usuarios los recibiremos en una cadena 
 	#Los guardamos en una lista para solicitar la informacion de los trabajos de cada uno de ellos
@@ -166,22 +172,9 @@ elif(args.u):
 		ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
 		pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
 
-	if(len(ejecucion) > 0):
-		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-		agregar_info(ejecucion)
-
-	if(len(pendientes) > 0):
-		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-		agregar_info(pendientes)
 elif(args.l):
 	ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
 	pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
-	if(len(ejecucion) > 0):
-		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-		agregar_info(ejecucion)
-	if(len(pendientes) > 0):
-		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-		agregar_info(pendientes)
 	
 else:
 	print "agregar parametro nombre de ususario"
@@ -189,8 +182,25 @@ else:
 
 
 #imprime_trabajos(info)
+if(len(ejecucion) > 0):
+	ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+	agregar_info(ejecucion)
+	#informacion_trabajos = imprimir_info(info)
+	#print informacion_trabajos
+	#time.sleep(3)
+if(len(pendientes) > 0):
+	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+	agregar_info(pendientes)
+	#informacion_trabajos = imprimir_info(info)
+	#print informacion_trabajos
+	#agregar_pendientes(pendientes)
+	#imprime_trabajos(pendientes)
+	#agregar_pendientes(pendientes)
 
-informacion_trabajos = imprimir_info(info)
-trabajos = commands.getoutput('echo '+"'"+informacion_trabajos+"'"+' | column -t')
-print trabajos
+imprime_trabajos(info)
+#informacion_trabajos = imprimir_info(info)
+#print informacion_trabajos
+#trabajos = commands.getoutput('echo '+"'"+informacion_trabajos+"'"+' | column -t')
+#sys.stdout.write(trabajos+'\n')
+#print trabajos
 
