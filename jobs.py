@@ -24,8 +24,8 @@ def imprimir_info(lista):
 
 def imprime_trabajos(lista):
 	for i in lista:
-		#renglon = commands.getoutput('echo '+"'"+i+"'"+' | column -t')
-		print i
+		print('{0:5s} {1:5s} {2:4s} {3:4s} {4:16s} {5:12s} {6:12s} {7:10s} {8:8s} {9:10s} {10:5s} {11}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11]))
+		
 		
 
 
@@ -46,15 +46,14 @@ def agregar_info(lista):
 		
 		lista_aux.extend(j[4:]) 
 		
-		cadena = " ".join(lista_aux)
-		info.append(cadena)
+		#cadena = " ".join(lista_aux)
+		#info.append(cadena)
+		info.append(lista_aux)
 
 def agregar_pendientes(pendientes):
 	lista_aux = []
 	for i in pendientes:
 		cadena = " ".join(i)
-		trabajos = commands.getoutput('echo '+"'"+cadena+"'"+' | column -t')
-		print trabajos
 		lista_aux.append(cadena)
 	info.extend(lista_aux)
 
@@ -198,9 +197,10 @@ if(len(pendientes) > 0):
 	#agregar_pendientes(pendientes)
 
 imprime_trabajos(info)
+#imprime_trabajos(info)
 #informacion_trabajos = imprimir_info(info)
 #print informacion_trabajos
 #trabajos = commands.getoutput('echo '+"'"+informacion_trabajos+"'"+' | column -t')
-#sys.stdout.write(trabajos+'\n')
 #print trabajos
+#sys.stdout.write(trabajos+'\n')
 
