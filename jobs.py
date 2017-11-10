@@ -23,8 +23,10 @@ def imprimir_info(lista):
 	return aux
 
 def imprime_trabajos(lista):
-	for i in lista:
-		print('{0:5s} {1:5s} {2:4s} {3:4s} {4:16s} {5:12s} {6:12s} {7:10s} {8:8s} {9:10s} {10:5s} {11}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11]))
+	for j in lista:
+		cadena = "%-6s%-6s%-6s%-6s%-12s%-12s%-12s%-10s%-10s%-12s%-13s%-5s%-12s" %  (j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])
+		print cadena
+		#print('{0:5s} {1:5s} {2:4s} {3:4s} {4:16s} {5:12s} {6:12s} {7:10s} {8:8s} {9:10s} {10:5s} {11:s}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11]))
 		
 		
 
@@ -142,7 +144,8 @@ parser.add_argument("-tR", action="store_true", help="Devuelve informacion de to
 parser.add_argument("-tPD", action="store_true", help="Devuelve informacion de todos los trabajos pendientes")
 parser.add_argument("-l", action="store_true", help="Devuelve la informacion de todos los trabajos")
 
-cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+#cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+cabecera = ["CORES","INUSE","LOAD","%EFF","JOBID","PARTITION","NAME","USER","STATE","TIME","TIME_LIMIT","NODES","NODELIST(REASON)"]
 info.append(cabecera)
 ejecucion = []
 pendientes = []
