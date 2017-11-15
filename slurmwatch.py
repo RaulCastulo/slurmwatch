@@ -183,8 +183,8 @@ def desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nli
     #Agregamos la cabecera a la pantalla
     cabecera = lista_salida[0]
     stdscr.attron(curses.color_pair(3))
-    stdscr.addstr(0, 0, cabecera)
-    stdscr.addstr(0, len(cabecera), " " * (width - len(cabecera)-1))
+    stdscr.addstr(0, 0, cabecera[inilinea:finlinea])
+    stdscr.addstr(0, len(cabecera[inilinea:finlinea]), " " * (width - len(cabecera[inilinea:finlinea])-1))
     stdscr.attroff(curses.color_pair(3))
     #Capturamos los datos del diccionario en una variable
     barra = ""
@@ -320,18 +320,18 @@ def crear_pantalla(stdscr):
 def main():
     stdscr = curses.initscr()
     height, width = stdscr.getmaxyx()
-    if(height >= 20 and width >= 132):
-        curses.wrapper(crear_pantalla)
+    if(height >= 20 and width >= 116):
+		curses.wrapper(crear_pantalla)
     else:
-        if(height < 20 and width < 132):
+        if(height < 20 and width < 116):
             terminar()
-            sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA MAS AMPLIA"+'\n')
-        if(height >= 20 and width < 132):
+            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 116"+'\n')
+        if(height >= 20 and width < 116):
             terminar()
-            sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA CON MAS COLUMNAS"+'\n')
-        if(height < 20 and width >= 132):
+            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 116"+'\n')
+        if(height < 20 and width >= 116):
             terminar()
-            sys.stdout.write("TAMANIO DE PANTALLA INSUFICIENTE...........SE REQUIERE UNA PANTALLA CON MAS RENGLONES"+'\n')
+            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 116"+'\n')
 
 if __name__ == "__main__":
 	"""
