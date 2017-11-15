@@ -44,15 +44,16 @@ args = parser.parse_args()
 if(args.username):
 	if(args.A):
 		usuarios = validar_usuario_investigador(args.username)
-		trabajos = commands.getoutput("python jobs.py "+usuarios)
 		if(args.p):
+			trabajos = commands.getoutput("python jobs.py "+usuarios+" | awk '{print $1,$2,$3,$4,$5,$6,$10}' | column -t ")
 			sys.stdout.write(trabajos+"\n")
 			quit()
 		else:
+			trabajos = commands.getoutput("python jobs.py "+usuarios)
 			lista_salida = trabajos.splitlines()
 			num_lineas = str(len(lista_salida) - 1)
 	elif(args.p):
-		trabajos = commands.getoutput("python jobs.py "+args.username)
+		trabajos = commands.getoutput("python jobs.py "+args.username+" | awk '{print $1,$2,$3,$4,$5,$6,$10}' | column -t ")
 		sys.stdout.write(trabajos+"\n")
 		quit()
 	else:
