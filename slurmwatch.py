@@ -16,6 +16,7 @@ def validar_usuario_investigador(usuario):
 	id_superior = 6000
 	#sys.stdout.write(usuario+"\n")
 	user_id = int(commands.getoutput("id -u "+usuario))
+	#user_id = int(commands.getoutput("echo $UID ")
 	#sys.stdout.write(str(user_id)+"\n")
 	if((id_inferior < user_id) and (user_id < id_superior)):
 		info_user = commands.getoutput("cat /etc/passwd | grep "+usuario+" | awk '{ print $1 }'")
@@ -61,11 +62,14 @@ if(args.username):
 		lista_salida = trabajos.splitlines()
 		num_lineas = str(len(lista_salida) - 1)
 else:
-	ayuda = commands.getoutput("python slurmwatch.py -h")
-	sys.stdout.write("Es necesario que proporcione nombre de usuario"+"\n")
-	sys.stdout.write(ayuda+"\n")
-	quit()
+	usuario = commands.getoutput("echo $USER")
+	trabajos = commands.getoutput("python jobs.py "+usuario)
+	lista_salida = trabajos.splitlines()
+	num_lineas = str(len(lista_salida) - 1)
 
+if(len(lista_salida) == 1):
+	sys.stdout.write("No cuentas con trabajos alojados en el servidor\n")
+	quit()
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
 
