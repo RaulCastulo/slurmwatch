@@ -46,6 +46,8 @@ def obtener_usuarios():
     return usuarios
 
 
+#Validamos si recibimos el parametro -p para imprimir la informacion en la terminal
+#si no se recibe el parametro entonces rescatamos la informacion para mostrarla con curses
 def validar_opcion_p(salida):
 	if(args.p):
 		sys.stdout.write(salida+'\n')
@@ -55,78 +57,6 @@ def validar_opcion_p(salida):
 		lista_salida = salida.splitlines()
 	return num_lineas, lista_salida
 
-# Manejo de parametros que puede recibir al ejecutar el script
-parser = argparse.ArgumentParser()
-parser.add_argument("-R", action="store_true", help="Permite ejecutar este script de manera remota")
-#parser.add_argument("-l", action="store_true", help="Muestra todos los trabajos")
-parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usuario <username>")
-parser.add_argument("-tR", action="store_true", help="Muestra todos los trabajos en ejecucion")
-parser.add_argument("-tPD", action="store_true", help="Muestra todos los trabajos pendientes")
-parser.add_argument("-p", action="store_true", help="Imprime la informacion de los trabajos en la terminal")
-
-
-# Obtenemos los parametros que puede recibir el script
-args = parser.parse_args()
-
-# Validamos los casos posibles al recibir parametros para indicar que hacer en cada caso
-#Validamos que parametros se recibieron para la ejecucion remota del script
-if(args.R):
-    remoto = True
-    if(args.R and args.tR):
-        if(args.username):
-            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR -u "+args.username)
-            num_lineas = str(len(salida.splitlines())-1)
-            lista_salida = salida.splitlines()
-        else: 
-            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR")
-            num_lineas = str(len(salida.splitlines())-1)
-            lista_salida = salida.splitlines()
-    elif(args.R and args.tPD):
-        if(args.username):
-            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD -u "+args.username)
-            num_lineas = str(len(salida.splitlines())-1)
-            lista_salida = salida.splitlines()
-        else:
-            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD")
-            num_lineas = str(len(salida.splitlines())-1)
-            lista_salida = salida.splitlines()
-    elif(args.username):
-        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -u "+args.username)
-        num_lineas = str(len(salida.splitlines())-1)
-        lista_salida = salida.splitlines()
-    else:
-        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py ")
-        num_lineas = str(len(salida.splitlines())-1)
-        lista_salida = salida.splitlines()
-#Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
-else:
-    remoto = False
-    if(args.tR):
-        if(args.username):
-			salida = commands.getoutput("python jobs.py -tR -u "+args.username)
-			num_lineas, lista_salida = validar_opcion_p(salida)
-        else: 
-			salida = commands.getoutput("python jobs.py -tR")
-			num_lineas, lista_salida = validar_opcion_p(salida)
-    elif(args.tPD):
-        if(args.username):
-			salida = commands.getoutput("python jobs.py -tPD -u "+args.username)
-			num_lineas, lista_salida = validar_opcion_p(salida)
-        else:
-			salida = commands.getoutput("python jobs.py -tPD")
-			num_lineas, lista_salida = validar_opcion_p(salida)
-    elif(args.username):
-		salida = commands.getoutput("python jobs.py -u "+args.username)
-		num_lineas, lista_salida = validar_opcion_p(salida)
-    else:
-		salida = commands.getoutput("python jobs.py -l")
-		num_lineas, lista_salida = validar_opcion_p(salida)
-
-if(len(lista_salida) <= 1):
-    ayuda = commands.getoutput("python slurmwatch.py -h")
-    sys.stdout.write("Es necesario que agregues el parametro \"-R\" para ejecutar el script de manera remota"+'\n')
-    sys.stdout.write('\n'+ayuda+'\n')
-    quit()
 
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
@@ -574,7 +504,85 @@ def crear_pantalla(stdscr):
             finlinea = width - 1
         elif(k == ord('h')):
             desplegar_ayuda(stdscr)
-         
+
+
+
+# Manejo de parametros que puede recibir al ejecutar el script
+parser = argparse.ArgumentParser()
+parser.add_argument("-R", action="store_true", help="Permite ejecutar este script de manera remota")
+#parser.add_argument("-l", action="store_true", help="Muestra todos los trabajos")
+parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usuario <username>")
+parser.add_argument("-tR", action="store_true", help="Muestra todos los trabajos en ejecucion")
+parser.add_argument("-tPD", action="store_true", help="Muestra todos los trabajos pendientes")
+parser.add_argument("-p", action="store_true", help="Imprime la informacion de los trabajos en la terminal")
+
+
+# Obtenemos los parametros que puede recibir el script
+args = parser.parse_args()
+
+# Validamos los casos posibles al recibir parametros para indicar que hacer en cada caso
+#Validamos que parametros se recibieron para la ejecucion remota del script
+if(args.R):
+    remoto = True
+    if(args.R and args.tR):
+        if(args.username):
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+        else: 
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tR")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+    elif(args.R and args.tPD):
+        if(args.username):
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD -u "+args.username)
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+        else:
+            salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -tPD")
+            num_lineas = str(len(salida.splitlines())-1)
+            lista_salida = salida.splitlines()
+    elif(args.username):
+        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py -u "+args.username)
+        num_lineas = str(len(salida.splitlines())-1)
+        lista_salida = salida.splitlines()
+    else:
+        salida = commands.getoutput("ssh "+administrador+" python ./slurmwatch/jobs.py ")
+        num_lineas = str(len(salida.splitlines())-1)
+        lista_salida = salida.splitlines()
+#Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
+else:
+    remoto = False
+    if(args.tR):
+        if(args.username):
+			salida = commands.getoutput("python jobs.py -tR -u "+args.username)
+			num_lineas, lista_salida = validar_opcion_p(salida)
+        else: 
+			salida = commands.getoutput("python jobs.py -tR")
+			num_lineas, lista_salida = validar_opcion_p(salida)
+    elif(args.tPD):
+        if(args.username):
+			salida = commands.getoutput("python jobs.py -tPD -u "+args.username)
+			num_lineas, lista_salida = validar_opcion_p(salida)
+        else:
+			salida = commands.getoutput("python jobs.py -tPD")
+			num_lineas, lista_salida = validar_opcion_p(salida)
+    elif(args.username):
+		salida = commands.getoutput("python jobs.py -u "+args.username)
+		num_lineas, lista_salida = validar_opcion_p(salida)
+    else:
+		salida = commands.getoutput("python jobs.py -l")
+		num_lineas, lista_salida = validar_opcion_p(salida)
+
+if(len(lista_salida) <= 1):
+    ayuda = commands.getoutput("python slurmwatch.py -h")
+    sys.stdout.write("Es necesario que agregues el parametro \"-R\" para ejecutar el script de manera remota"+'\n')
+    sys.stdout.write('\n'+ayuda+'\n')
+    quit()
+
+
+
+
 def main():
     stdscr = curses.initscr()
     height, width = stdscr.getmaxyx()
