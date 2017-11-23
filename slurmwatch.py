@@ -515,7 +515,7 @@ parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usu
 parser.add_argument("-tR", action="store_true", help="Muestra todos los trabajos en ejecucion")
 parser.add_argument("-tPD", action="store_true", help="Muestra todos los trabajos pendientes")
 parser.add_argument("-p", action="store_true", help="Imprime la informacion de los trabajos en la terminal")
-
+parser.add_argument("-c", action="store_true", help="Imprime en terminal el numero de trabajos por usuario")
 
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
@@ -552,25 +552,29 @@ if(args.R):
         lista_salida = salida.splitlines()
 #Validamos las opciones recibidas en la ejecucion del script dentro de un  nodo en el cluster
 else:
-    remoto = False
-    if(args.tR):
-        if(args.username):
+	remoto = False
+	if(args.tR):
+		if(args.username):
 			salida = commands.getoutput("python jobs.py -tR -u "+args.username)
 			num_lineas, lista_salida = validar_opcion_p(salida)
-        else: 
+		else: 
 			salida = commands.getoutput("python jobs.py -tR")
 			num_lineas, lista_salida = validar_opcion_p(salida)
-    elif(args.tPD):
-        if(args.username):
+	elif(args.tPD):
+		if(args.username):
 			salida = commands.getoutput("python jobs.py -tPD -u "+args.username)
 			num_lineas, lista_salida = validar_opcion_p(salida)
-        else:
+		else:
 			salida = commands.getoutput("python jobs.py -tPD")
 			num_lineas, lista_salida = validar_opcion_p(salida)
-    elif(args.username):
+	elif(args.username):
 		salida = commands.getoutput("python jobs.py -u "+args.username)
 		num_lineas, lista_salida = validar_opcion_p(salida)
-    else:
+	elif(args.c):
+		salida = commands.getoutput("python jobs.py -c")
+		sys.stdout.write(salida+'\n')
+		quit()
+	else:
 		salida = commands.getoutput("python jobs.py -l")
 		num_lineas, lista_salida = validar_opcion_p(salida)
 
