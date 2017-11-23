@@ -18,6 +18,12 @@ def imprimir_info(lista):
 		aux += i+"\n"
 	return aux
 
+
+def imprime_trabajos(lista):
+	for j in lista:
+		cadena = "%-6s%-6s%-6s%-6s%-12s%-12s%-12s%-10s%-10s%-12s%-13s%-6s%-12s" %  (j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])
+		print cadena
+
 #Metodo que servira para poder agregar elementos a la lista info
 def agregar_info(lista):
 	
@@ -33,10 +39,12 @@ def agregar_info(lista):
 		lista_aux.append(str(j[2]))
 		lista_aux.append(str(j[3]))
 		
-		lista_aux.extend(j[4:]) 
-		
-		cadena = " ".join(lista_aux)
-		info.append(cadena)
+		lista_aux.extend(j[4:])
+
+		info.append(lista_aux)
+		#Esto solo para que funcione al momento de hacer echo de la cadena para obtener mejor tabulacion
+		#cadena = " ".join(lista_aux)
+		#info.append(cadena)
 
 def ajustar_output(output):
    
@@ -114,8 +122,11 @@ def agregar_columnas_trabajos_pendientes(pendientes):
 	aux.append(columnas)
     return aux
 
+#Esta variable es util para cuando hacemos echo
+#cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+cabecera = ["CORES","INUSE","LOAD","%EFF","JOBID","PARTITION","NAME","USER","STATE","TIME","TIME_LIMIT","NODES","NODELIST(REASON)"]
 
-cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+
 info.append(cabecera)
 
 num_args = len(sys.argv)
@@ -135,8 +146,10 @@ if(len(pendientes) > 0):
 	pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 	agregar_info(pendientes)
 
-
+if(len(info) > 1):
+	imprime_trabajos(info)
+"""
+Falta validar bien la tabulacion ya que si se rebasa limite de caracteres de echo arroja cadena vacia
 trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
-
 print trabajos
-
+"""
