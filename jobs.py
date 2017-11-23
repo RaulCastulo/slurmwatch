@@ -170,32 +170,35 @@ def obtener_usuarios():
 	#A continuacion agregamos nombres de usuario a dic_usuarios, aseguramos que no halla nombres de usuario repetidos
 	#Y recuperamos los nombres de los usuarios en una lista 
 	usuarios_aux = [dict_usuarios.setdefault(x,x) for x in lista_usuarios if x not in dict_usuarios]	
-	#Recuperamos todos los nombres de usuario en una cadena
-	usuarios = " ".join(usuarios_aux)
 	
 	return usuarios_aux
 
 
 def trabajos_por_usuario():
 	usuarios = obtener_usuarios()
-	cabecera = ["uSER", "RUNNING", "PENDING"]
+	ejecucion = (commands.getoutput("squeue -h -tR -o %u")).splitlines()
+	pendientes = (commands.getoutput("squeue -h -tPD -o %u")).splitlines()
+	cabecera = ["USER", "RUNNING", "PENDING"]
 	informacion = []
 	informacion.append(cabecera)
-
-	ejecucion = commands.getoutput("squeue -h -tR -o %u")
-	pendientes = commands.getoutput("squeue -h -tPD -o %u")
+	total_ejecucion = 0
+	total_pendientes = 0
 
 	for usr in usuarios:
 		trabajos_por_usuario = []
 		num_trabajos_ejecucion = ejecucion.count(usr)
 		num_trabajos_pendientes = pendientes.count(usr)
 		
+		total_ejecucion += num_trabajos_ejecucion
+		total_pendientes += num_trabajos_pendientes
+
 		trabajos_por_usuario.append(usr)
 		trabajos_por_usuario.append(str(num_trabajos_ejecucion))
 		trabajos_por_usuario.append(str(num_trabajos_pendientes))
 		
 		informacion.append(trabajos_por_usuario)
-	
+	totales = ["Total", str(total_ejecucion), str(total_pendientes)]
+	informacion.append(totales)
 	return informacion
 
 
@@ -261,27 +264,4 @@ else:
 	quit()
 
 
-#imprime_trabajos(info)
-#if(len(ejecucion) > 0):
-	#ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-	#agregar_info(ejecucion)
-	#informacion_trabajos = imprimir_info(info)
-	#print informacion_trabajos
-	#time.sleep(3)
-#if(len(pendientes) > 0):
-	#pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-	#agregar_info(pendientes)
-	#informacion_trabajos = imprimir_info(info)
-	#print informacion_trabajos
-	#agregar_pendientes(pendientes)
-	#imprime_trabajos(pendientes)
-	#agregar_pendientes(pendientes)
-
-#imprime_trabajos(info)
-#imprime_trabajos(info)
-#informacion_trabajos = imprimir_info(info)
-#print informacion_trabajos
-#trabajos = commands.getoutput('echo '+"'"+informacion_trabajos+"'"+' | column -t')
-#print trabajos
-#sys.stdout.write(trabajos+'\n')
 
