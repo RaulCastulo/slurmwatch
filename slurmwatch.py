@@ -10,14 +10,10 @@ global salida
 global num_lineas
 global lista_salida
 
-def validar_usuario_investigador(usuario):
+def validar_usuario_investigador(usuario, user_id):
 	usuarios = " "
 	id_inferior = 5000
 	id_superior = 6000
-	#sys.stdout.write(usuario+"\n")
-	user_id = int(commands.getoutput("id -u "+usuario))
-	#user_id = int(commands.getoutput("echo $UID ")
-	#sys.stdout.write(str(user_id)+"\n")
 	if((id_inferior < user_id) and (user_id < id_superior)):
 		info_user = commands.getoutput("cat /etc/passwd | grep "+usuario+" | awk '{ print $1 }'")
 		info_user = info_user.split()
@@ -26,7 +22,7 @@ def validar_usuario_investigador(usuario):
 			aux = i.split(":")
 			users.append(aux[0])
 		usuarios = " ".join(users)
-		#sys.stdout.write(usuarios+"\n")
+		sys.stdout.write(usuarios+'\n')
 	else:
 		usuarios = usuario
 	return usuarios
@@ -34,33 +30,31 @@ def validar_usuario_investigador(usuario):
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usuario <username>")
-parser.add_argument("-A", action="store_true", help="Muestra todos los trabajos")
-parser.add_argument("-p", action="store_true", help="Imprime la informacion en la terminal")
+parser.add_argument("-A", action="store_true", help="Muestra informacion de trabajos del usuario, colaboradores y alumnos")
+parser.add_argument("-p", action="store_true", help="Imprime la informacion de los trabajos en la terminal")
 
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
 
 # Validamos los casos posibles al recibir parametros para indicar que hacer en cada caso
 
-if(args.username):
-	if(args.A):
-		usuarios = validar_usuario_investigador(args.username)
-		if(args.p):
-			trabajos = commands.getoutput("python jobs.py "+usuarios+" | awk '{print $1,$2,$3,$4,$5,$6,$10}' | column -t ")
-			sys.stdout.write(trabajos+"\n")
-			quit()
-		else:
-			trabajos = commands.getoutput("python jobs.py "+usuarios)
-			lista_salida = trabajos.splitlines()
-			num_lineas = str(len(lista_salida) - 1)
-	elif(args.p):
-		trabajos = commands.getoutput("python jobs.py "+args.username+" | awk '{print $1,$2,$3,$4,$5,$6,$10}' | column -t ")
+if(args.A):
+	usuario = commands.getoutput("echo $USER")
+	user_id = int(commands.getoutput("echo $UID"))
+	usuarios = validar_usuario_investigador(usuario, user_id)
+	if(args.p):
+		trabajos = commands.getoutput("python jobs.py "+usuarios+" | awk '{print $1,$2,$3,$4,$5,$6,$10}' | column -t ")
 		sys.stdout.write(trabajos+"\n")
 		quit()
 	else:
-		trabajos = commands.getoutput("python jobs.py "+args.username)
+		trabajos = commands.getoutput("python jobs.py "+usuarios)
 		lista_salida = trabajos.splitlines()
 		num_lineas = str(len(lista_salida) - 1)
+elif(args.p):
+	usuario = commands.getoutput("echo $USER")
+	trabajos = commands.getoutput("python jobs.py "+usuario+" | awk '{print $1,$2,$3,$4,$5,$6,$10}' | column -t ")
+	sys.stdout.write(trabajos+"\n")
+	quit()
 else:
 	usuario = commands.getoutput("echo $USER")
 	trabajos = commands.getoutput("python jobs.py "+usuario)
@@ -324,22 +318,22 @@ def crear_pantalla(stdscr):
 def main():
     stdscr = curses.initscr()
     height, width = stdscr.getmaxyx()
-    if(height >= 20 and width >= 116):
+    if(height >= 20 and width >= 119):
 		curses.wrapper(crear_pantalla)
     else:
-        if(height < 20 and width < 116):
+        if(height < 20 and width < 119):
             terminar()
-            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 116"+'\n')
-        if(height >= 20 and width < 116):
+            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 119"+'\n')
+        if(height >= 20 and width < 119):
             terminar()
-            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 116"+'\n')
-        if(height < 20 and width >= 116):
+            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 119"+'\n')
+        if(height < 20 and width >= 119):
             terminar()
-            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 116"+'\n')
+            sys.stdout.write("Tamanio de pantalla insuficiente.....Renglones: "+str(height)+" Columnas: "+str(width)+"\nSe requiere minimo.....Renglones: 20 Columnas: 119"+'\n')
 
 if __name__ == "__main__":
 	"""
-	
+	Destectamos cuando usuario presona C-c y terminamos el programa
 	"""
 	try:
 		main()
