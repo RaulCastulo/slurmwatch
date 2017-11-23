@@ -1,3 +1,5 @@
+
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 import curses
 import commands
@@ -29,7 +31,6 @@ def validar_usuario_investigador(usuario, user_id):
 
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
-parser.add_argument("-u", "--username", help="Muestra todos los trabajos del usuario <username>")
 parser.add_argument("-A", action="store_true", help="Muestra informacion de trabajos del usuario, colaboradores y alumnos")
 parser.add_argument("-p", action="store_true", help="Imprime la informacion de los trabajos en la terminal")
 
@@ -61,8 +62,7 @@ else:
 	lista_salida = trabajos.splitlines()
 	num_lineas = str(len(lista_salida) - 1)
 
-if(len(lista_salida) == 1):
-	sys.stdout.write("No cuentas con trabajos alojados en el servidor\n")
+if(len(lista_salida) == 0):
 	quit()
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
