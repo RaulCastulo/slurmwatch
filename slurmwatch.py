@@ -176,7 +176,6 @@ def validar_usuario_investigador(usuario, user_id):
 			aux = i.split(":")
 			users.append(aux[0])
 		usuarios = " ".join(users)
-		sys.stdout.write(usuarios+'\n')
 	else:
 		usuarios = usuario
 	return usuarios
@@ -454,8 +453,6 @@ if(len(lista_salida) == 0):
 def main():
 	stdscr = curses.initscr()
 	height, width = stdscr.getmaxyx()
-	terminar()
-	sys.stdout.write("alto " +str(height)+" ancho "+str(width)+"\n")
 	if(height >= 20 and width >= 129):
 		curses.wrapper(crear_pantalla)
 	else:
