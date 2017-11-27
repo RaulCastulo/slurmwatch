@@ -416,7 +416,7 @@ def crear_pantalla(stdscr):
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
 parser.add_argument("-A", action="store_true", help="Muestra informacion de trabajos del usuario, colaboradores y alumnos")
-parser.add_argument("-p", action="store_true", help="Imprime la informacion de los trabajos en la terminal")
+parser.add_argument("-p", action="store_true", help="Imprime informacion de los trabajos en la terminal")
 
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
