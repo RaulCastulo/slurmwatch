@@ -383,25 +383,6 @@ def recuperar_linea(lista_salida, no_linea, nlineasup, nlineainf):
         contador = contador + 1
     return linea
 
-def desplegar_ayuda(stdscr):
-    k = 0
-    stdscr.clear()
-    stdscr.refresh()
-    
-    info_ayuda = {1:"\tq:", 2:"\t\tSalir de la pantalla actual o salir del programa", 3:"\th:", 4: "\t\tMuesta esta pantalla de ayuda"}
-    cont_y = 5
-    
-    while (k != ord('q')):
-        for i in info_ayuda:
-            if(i%2 != 0):
-                stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(6))
-                cont_y += 1
-            else: 
-                stdscr.addstr(cont_y,0, info_ayuda[i], curses.color_pair(5))
-                cont_y += 1 
-         
-        k = stdscr.getch()
-
 
 def crear_pantalla(stdscr):
     k = 0 
