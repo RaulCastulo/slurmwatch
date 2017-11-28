@@ -382,6 +382,25 @@ def recuperar_linea(lista_salida, no_linea, nlineasup, nlineainf):
         contador = contador + 1
     return linea
 
+def crear_subpantalla(stdscr, salida):
+	k = 0 
+	cursor_x = 0
+	cursor_y = 1		    
+	inicializar_curses(stdscr, cursor_y, cursor_x) 	    
+	#info_barra_inf = {1:" q ",2:" Salir ",3:" Enter ", 4: " Conectar ", 5:" h ", 6:" Ayuda "}
+	info_barra_inf = {1:" q ",2:" Salir ",3:" h ", 4:" Ayuda "}
+	lista_salida = salida.splitlines()
+	height, width = stdscr.getmaxyx()
+	nlineasup = 1
+	nlineainf = height - 1 #para tomar las lineas que podemos mostrar 
+	inilinea = 0
+	finlinea = width - 1
+	while (k != ord('q')):
+		desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
+		# Esperamos a que se teclee una opcion
+		k = stdscr.getch()
+		if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
+			cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
 
 def crear_pantalla(stdscr):
     k = 0 
@@ -406,9 +425,17 @@ def crear_pantalla(stdscr):
 
         desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
         
-        k = stdscr.getch()
-        if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
-            cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
+	k = stdscr.getch()
+	if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
+		cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
+	elif(k == ord("\n")):
+		#Recuperamos la informacion de la linea en la que actualmente estael cursor
+		linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+		#Guardamos cada una de las cadenas que contiene la linea en un arreglo
+		datos = linea.split()
+		jobid = datos[-9]
+		salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
+		crear_subpantalla(stdscr, salida)
 
 
  
