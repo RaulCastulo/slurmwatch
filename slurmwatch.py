@@ -15,6 +15,7 @@ global lista_salida
 #Haremos uso de esta lista para poder almacenar la informacion de los trabajos
 #Esta lista contendra elementos de tipo string para facilitar la impresion en pantalla
 info = []
+num_lineas_imprimir = 21
 
 # Con esta funcion almacenamos todo en una variable para despues hacer echo y aplicar column -t para que se haga de mejor manera la tabulacion
 # Falta validar bien ya que de momento se rebasa el limite de caracteres aceptados por echo y al final imprime una linea en blanco
@@ -28,12 +29,23 @@ def imprimir_info(lista):
 		aux += i+"\n"
 	return aux
 
-
-def imprime_trabajos(lista):
+# lista: sera el arreglo que tendra la informacion a imprimir
+# opcion: tendra valores True y False, True para imprimir toda la lista, False para imprimir solo el numero especificado en num_lineas_imprimir
+def imprime_trabajos(lista, opcion):
 	informacion = ""
-	for j in lista:
-		cadena = "%-6s%-6s%-6s%-6s%-12s%-12s%-12s%-10s%-10s%-12s%-13s%-6s%-12s" %  (j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])
-		informacion +=cadena+"\n"
+	if(opcion == True):
+		for j in lista:
+			cadena = "%-6s%-6s%-6s%-6s%-12s%-12s%-12s%-10s%-10s%-12s%-13s%-6s%-12s" %  (j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])
+			informacion +=cadena+"\n"
+	else:
+		contador = 0
+		for j in lista:
+			if(contador == num_lineas_imprimir):
+				break
+			else:
+				cadena = "%-6s%-6s%-6s%-6s%-12s%-12s%-12s%-10s%-10s%-12s%-13s%-6s%-12s" %  (j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7], j[8], j[9], j[10], j[11],j[12])
+				informacion +=cadena+"\n"
+				contador += 1
 	return informacion
 
 #Metodo que servira para poder agregar elementos a la lista info
@@ -134,7 +146,8 @@ def agregar_columnas_trabajos_pendientes(pendientes):
 	aux.append(columnas)
     return aux
 
-def consultar_trabajos(usuario):
+# opcion_p: sera True o False, True si se recibio el parametro -p y False en caso contrario
+def consultar_trabajos(consulta, usuario, opcion_p):
 	
 	#Esta variable es util para cuando hacemos echo y column -t 
 	#cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
@@ -145,23 +158,54 @@ def consultar_trabajos(usuario):
 	ejecucion = []
 	pendientes = []
 
-	for i in usuarios:
-		ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
-		pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
-	
-	if(len(ejecucion) > 0):
-		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-		agregar_info(ejecucion)
+	if(consulta == "ejecucion"):
+		if(usuario == "root"):
+			ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
+			if(len(ejecucion) > 0):
+				ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+				agregar_info(ejecucion)
+		else:
+			for i in usuarios:
+				ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
+			if(len(ejecucion) > 0):
+				ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+				agregar_info(ejecucion)
 
-	if(len(pendientes) > 0):
-		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-		agregar_info(pendientes)
+	elif(consulta == "pendientes"):
+		if(usuario == "root"):
+			pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
+			if(len(pendientes) > 0):
+				pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+				agregar_info(pendientes)
+		else:
+			for i in usuarios:
+				pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
+			if(len(pendientes) > 0):
+				pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+				agregar_info(pendientes)
+	else:# Entonce recibimos la cadena ejec-pend
+		if(usuario == "root"):
+			ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
+			pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
+		else:
+			for i in usuarios:
+				ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
+				pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
+	
+		if(len(ejecucion) > 0):
+			ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+			agregar_info(ejecucion)
+
+		if(len(pendientes) > 0):
+			pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+			agregar_info(pendientes)
 
 	if(len(info) > 1):
-		informacion_trabajos = imprime_trabajos(info)
+		if(opcion_p == False):
+			informacion_trabajos = imprime_trabajos(info, True)
+		else:
+			informacion_trabajos = imprime_trabajos(info, False) + "..." + str(len(info) - num_lineas_imprimir) + "+\n"
 	return informacion_trabajos
-
-
 
 
 def validar_usuario_investigador(usuario, user_id):
@@ -388,7 +432,7 @@ def crear_subpantalla(stdscr, salida):
 	cursor_y = 1		    
 	inicializar_curses(stdscr, cursor_y, cursor_x) 	    
 	#info_barra_inf = {1:" q ",2:" Salir ",3:" Enter ", 4: " Conectar ", 5:" h ", 6:" Ayuda "}
-	info_barra_inf = {1:" q ",2:" Salir ",3:" h ", 4:" Ayuda "}
+	info_barra_inf = {1:" q ",2:" Salir "}
 	lista_salida = salida.splitlines()
 	height, width = stdscr.getmaxyx()
 	nlineasup = 1
@@ -419,7 +463,7 @@ def crear_pantalla(stdscr):
     finlinea = width - 1
 
     #Diccionario que contiene la informacion de teclas especiales
-    info_barra_inf = {1:" q ",2:"Salir"}
+    info_barra_inf = {1:" q ",2:"Salir", 3:" Enter ", 4:"Ver trabajo"}
     
     while (k != ord('q')):
 
@@ -443,7 +487,9 @@ def crear_pantalla(stdscr):
 parser = argparse.ArgumentParser()
 parser.add_argument("-A", action="store_true", help="Muestra informacion de trabajos del usuario, colaboradores y alumnos")
 parser.add_argument("-p", action="store_true", help="Imprime informacion de los trabajos en la terminal")
-
+parser.add_argument("-tPD", action="store_true", help="Muestra informacion de los trabajos pendientes del usuario")
+parser.add_argument("-l", action="store_true", help="Muestra informacion de trabajos en ejecucion y pendientes del usuario")
+parser.add_argument("-tR", action="store_true", help="Muestra informacion de trabajos en ejecucion")
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
 
@@ -454,21 +500,50 @@ if(args.A):
 	user_id = int(os.getuid())
 	usuarios = validar_usuario_investigador(usuario, user_id)
 	if(args.p):
-		trabajos = consultar_trabajos(usuarios)
+		trabajos = consultar_trabajos("ejec-pend", usuarios, True)
 		sys.stdout.write(trabajos+"\n")
 		quit()
+	elif(args.tR):
+		trabajos = consultar_trabajos("ejecucion", usuarios, False)
+		lista_salida = trabajos.splitlines()
+		num_lineas = str(len(lista_salida) - 1)
+	elif(args.tPD):
+		trabajos = consultar_trabajos("pendientes", usuarios, False)
+		lista_salida = trabajos.splitlines()
+		num_lineas = str(len(lista_salida) - 1)
 	else:
-		trabajos = consultar_trabajos(usuarios)
+		trabajos = consultar_trabajos("ejec-pend",usuarios, False)
 		lista_salida = trabajos.splitlines()
 		num_lineas = str(len(lista_salida) - 1)
 elif(args.p):
 	usuario = os.getenv('USER')
-	trabajos = consultar_trabajos(usuario)
+	if(usuario == "root"):
+		trabajos = consultar_trabajos("ejecucion", usuario, False)
+	else:
+		trabajos = consultar_trabajos("ejec-pend", usuario, True)
 	sys.stdout.write(trabajos)
 	quit()
+elif(args.tPD):
+	usuario = os.getenv('USER')
+	trabajos = consultar_trabajos("pendientes", usuario, False)
+	lista_salida = trabajos.splitlines()
+	num_lineas = str(len(lista_salida) - 1)
+elif(args.tR):
+	usuario = os.getenv('USER')
+	trabajos = consultar_trabajos("ejecucion", usuario, False)
+	lista_salida = trabajos.splitlines()
+	num_lineas = str(len(lista_salida) - 1)
+elif(args.l):
+	usuario = os.getenv('USER')
+	trabajos = consultar_trabajos("ejec-pend", usuario, False)
+	lista_salida = trabajos.splitlines()
+	num_lineas = str(len(lista_salida) - 1)
 else:
 	usuario = os.getenv('USER')
-	trabajos = consultar_trabajos(usuario)
+	if(usuario == "root"):
+		trabajos = consultar_trabajos("ejecucion", usuario, False)
+	else:
+		trabajos = consultar_trabajos("ejec-pend", usuario, False)
 	lista_salida = trabajos.splitlines()
 	num_lineas = str(len(lista_salida) - 1)
 
