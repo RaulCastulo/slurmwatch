@@ -426,6 +426,33 @@ def recuperar_linea(lista_salida, no_linea, nlineasup, nlineainf):
         contador = contador + 1
     return linea
 
+def desplegar_ayuda(stdscr):
+	k = 0
+	stdscr.clear()
+	stdscr.refresh()
+	barra = ""
+	info_ayuda = {1:"q:", 2:"\tSalir de la pantalla actual o salir del programa", 3:"Enter:", 4:"\tVer informacion acerca del trabajo que actualmente se encuentre seleccionado", 5:"u:", 6:"\tVer todos los trabajos del usuario que actualmente este seleccionado", 7:"r:", 8:"\tVer los trabajos en ejecucion del usuario que se encuentre seleccionado", 9:"p:", 10:"\tVer los trabajos pendientes del usuario que actualmente este seleccionado", 11:"l:", 12:"\tMuestra informacion acerca de todos los trabajos", 13:"h:", 14:"\tMuestra esta pantalla de ayuda"}
+	for i in info_ayuda:
+		barra = barra + info_ayuda[i]
+	
+	while(k != ord('q')):
+		inicio = 0
+		fin = 0
+		numero_linea = 0
+		for i in info_ayuda:
+			fin = fin + len(info_ayuda[i])
+			if(i%2 !=0 ):
+				stdscr.attron(curses.color_pair(6))
+				stdscr.addstr(numero_linea, 0, barra[inicio:fin])
+				stdscr.attroff(curses.color_pair(6))
+			else:
+				stdscr.attron(curses.color_pair(5))
+				stdscr.addstr(numero_linea, 0, barra[inicio:fin])
+				stdscr.attroff(curses.color_pair(5))
+			numero_linea += 1
+			inicio = inicio + len(info_ayuda[i])
+		k = stdscr.getch()
+
 def crear_subpantalla(stdscr, salida):
 	k = 0 
 	cursor_x = 0
@@ -463,7 +490,7 @@ def crear_pantalla(stdscr):
     finlinea = width - 1
 
     #Diccionario que contiene la informacion de teclas especiales
-    info_barra_inf = {1:" q ",2:"Salir", 3:" Enter ", 4:"Ver trabajo"}
+    info_barra_inf = {1:" q ",2:"Salir", 3:" Enter ", 4:"Ver trabajo", 5:" u ",6:"Trabajos de usuario" , 7:" r ", 8:"En ejecucion", 9:" p ", 10:"Pendientes", 11:" l ", 12:"Todos trabajos",13: " h ", 14:"Ayuda"}
     
     while (k != ord('q')):
 
@@ -480,8 +507,48 @@ def crear_pantalla(stdscr):
 		jobid = datos[-9]
 		salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
 		crear_subpantalla(stdscr, salida)
-
-
+	elif(k == ord('h')):
+		desplegar_ayuda(stdscr)
+	elif(k == ord('u')):
+		linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+		datos = linea.split()
+		usuario = datos[-6]
+		
+		num_lineas = str(len(salida.splitlines())-1)
+		lista_salida = salida.splitlines()
+		cursor_x = 0
+		cursor_y = 1
+		height, width = stdscr.getmaxyx()
+		nlineasup = 1
+		nlineainf = height - 1 
+		inilinea = 0
+		finlinea = width - 1
+	elif(k == ord('p')):
+		linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+		datos = linea.split()
+		usuario = datos[-6]
+		num_lineas = str(len(salida.splitlines())-1)
+		lista_salida = salida.splitlines()
+		cursor_x = 0
+		cursor_y = 1
+		height, width = stdscr.getmaxyx()
+		nlineasup = 1
+		nlineainf = height - 1 
+		inilinea = 0
+		finlinea = width - 1
+	elif(k == ord('l')):
+		usuarios = obtener_usuarios()
+		num_lineas = str(len(salida.splitlines())-1)
+		lista_salida = salida.splitlines()
+		cursor_x = 0
+		cursor_y = 1
+		#Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
+		#a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
+		height, width = stdscr.getmaxyx()
+		nlineasup = 1
+		nlineainf = height - 1 
+		inilinea = 0
+		finlinea = width - 1
  
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
@@ -539,7 +606,8 @@ elif(args.l):
 	lista_salida = trabajos.splitlines()
 	num_lineas = str(len(lista_salida) - 1)
 else:
-	usuario = os.getenv('USER')
+	#usuario = os.getenv('USER')
+	usuario = "gamm"
 	if(usuario == "root"):
 		trabajos = consultar_trabajos("ejecucion", usuario, False)
 	else:
