@@ -517,6 +517,8 @@ def crear_pantalla(stdscr):
 			linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
 			datos = linea.split()
 			usuario = os.getenv('USER')
+			if(usuario == "root"):
+				usuario = datos[-6]	
 			trabajos = consultar_trabajos("ejec-pend", usuario, False)	
 			num_lineas = str(len(trabajos.splitlines())-1)
 			lista_salida = trabajos.splitlines()
