@@ -537,7 +537,15 @@ def crear_pantalla(stdscr):
 		inilinea = 0
 		finlinea = width - 1
 	elif(k == ord('l')):
-		usuarios = obtener_usuarios()
+		if(args.A):
+			usuario = os.getenv('USER')
+			user_id = int(os.getuid())
+			usuarios = validar_usuario_investigador(usuario, user_id)
+			salida = consultar_trabajos("ejec-pend",usuarios, False)
+		else:
+			usuario = os.getenv('USER')
+			salida = consultar_trabajos("ejec-pend",usuario, False)
+		#usuarios = obtener_usuarios()
 		num_lineas = str(len(salida.splitlines())-1)
 		lista_salida = salida.splitlines()
 		cursor_x = 0
@@ -606,8 +614,7 @@ elif(args.l):
 	lista_salida = trabajos.splitlines()
 	num_lineas = str(len(lista_salida) - 1)
 else:
-	#usuario = os.getenv('USER')
-	usuario = "gamm"
+	usuario = os.getenv('USER')
 	if(usuario == "root"):
 		trabajos = consultar_trabajos("ejecucion", usuario, False)
 	else:
