@@ -204,7 +204,10 @@ def consultar_trabajos(consulta, usuario, opcion_p):
 		if(opcion_p == False):
 			informacion_trabajos = imprime_trabajos(info, True)
 		else:
-			informacion_trabajos = imprime_trabajos(info, False) + "..." + str(len(info) - num_lineas_imprimir) + "+\n"
+			if((len(info) - num_lineas_imprimir) > 0 ):
+				informacion_trabajos = imprime_trabajos(info, False) + "..." + str(len(info) - num_lineas_imprimir) + "+\n"
+			else:
+				informacion_trabajos = imprime_trabajos(info, False) + "\n"
 	return informacion_trabajos
 
 
@@ -474,89 +477,119 @@ def crear_subpantalla(stdscr, salida):
 			cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
 
 def crear_pantalla(stdscr):
-    k = 0 
-    cursor_x = 0
-    cursor_y = 1
-    global lista_salida
-    global num_lineas
-    global salida
-    inicializar_curses(stdscr, cursor_y, cursor_x) 
+	k = 0 
+	cursor_x = 0
+	cursor_y = 1
+	global lista_salida
+	global num_lineas
+	global info
+	inicializar_curses(stdscr, cursor_y, cursor_x) 
     
-    #Capturamos cada linea que contiene la variable salida en un arreglo
-    height, width = stdscr.getmaxyx()
-    nlineasup = 1
-    nlineainf = height - 1 
-    inilinea = 0
-    finlinea = width - 1
+	#Capturamos cada linea que contiene la variable salida en un arreglo
+	height, width = stdscr.getmaxyx()
+	nlineasup = 1
+	nlineainf = height - 1 
+	inilinea = 0
+	finlinea = width - 1
 
     #Diccionario que contiene la informacion de teclas especiales
-    info_barra_inf = {1:" q ",2:"Salir", 3:" Enter ", 4:"Ver trabajo", 5:" u ",6:"Trabajos de usuario" , 7:" r ", 8:"En ejecucion", 9:" p ", 10:"Pendientes", 11:" l ", 12:"Todos trabajos",13: " h ", 14:"Ayuda"}
+	info_barra_inf = {1:" q ",2:"Salir", 3:" Enter ", 4:"Ver trabajo", 5:" u ",6:"Trabajos de usuario" , 7:" r ", 8:"En ejecucion", 9:" p ", 10:"Pendientes", 11:" l ", 12:"Todos trabajos",13: " h ", 14:"Ayuda"}
     
-    while (k != ord('q')):
+	while (k != ord('q')):
 
-        desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
+		desplegar_pantalla(stdscr, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida, info_barra_inf)
         
-	k = stdscr.getch()
-	if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
-		cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
-	elif(k == ord("\n")):
-		#Recuperamos la informacion de la linea en la que actualmente estael cursor
-		linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-		#Guardamos cada una de las cadenas que contiene la linea en un arreglo
-		datos = linea.split()
-		jobid = datos[-9]
-		salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
-		crear_subpantalla(stdscr, salida)
-	elif(k == ord('h')):
-		desplegar_ayuda(stdscr)
-	elif(k == ord('u')):
-		linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-		datos = linea.split()
-		usuario = datos[-6]
-		
-		num_lineas = str(len(salida.splitlines())-1)
-		lista_salida = salida.splitlines()
-		cursor_x = 0
-		cursor_y = 1
-		height, width = stdscr.getmaxyx()
-		nlineasup = 1
-		nlineainf = height - 1 
-		inilinea = 0
-		finlinea = width - 1
-	elif(k == ord('p')):
-		linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
-		datos = linea.split()
-		usuario = datos[-6]
-		num_lineas = str(len(salida.splitlines())-1)
-		lista_salida = salida.splitlines()
-		cursor_x = 0
-		cursor_y = 1
-		height, width = stdscr.getmaxyx()
-		nlineasup = 1
-		nlineainf = height - 1 
-		inilinea = 0
-		finlinea = width - 1
-	elif(k == ord('l')):
-		if(args.A):
+		k = stdscr.getch()
+		if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
+			cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
+		elif(k == ord("\n")):
+			#Recuperamos la informacion de la linea en la que actualmente estael cursor
+			linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+			#Guardamos cada una de las cadenas que contiene la linea en un arreglo
+			datos = linea.split()
+			jobid = datos[-9]
+			salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
+			crear_subpantalla(stdscr, salida)
+		elif(k == ord('h')):
+			desplegar_ayuda(stdscr)
+		elif(k == ord('u')):
+			info = []
+			linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+			datos = linea.split()
 			usuario = os.getenv('USER')
-			user_id = int(os.getuid())
-			usuarios = validar_usuario_investigador(usuario, user_id)
-			salida = consultar_trabajos("ejec-pend",usuarios, False)
-		else:
+			trabajos = consultar_trabajos("ejec-pend", usuario, False)	
+			num_lineas = str(len(trabajos.splitlines())-1)
+			lista_salida = trabajos.splitlines()
+			cursor_x = 0
+			cursor_y = 1
+			height, width = stdscr.getmaxyx()
+			nlineasup = 1
+			nlineainf = height - 1 
+			inilinea = 0
+			finlinea = width - 1
+		elif(k == ord('r')):
+			info = []
+			linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+			datos = linea.split()
 			usuario = os.getenv('USER')
-			salida = consultar_trabajos("ejec-pend",usuario, False)
-		#usuarios = obtener_usuarios()
-		num_lineas = str(len(salida.splitlines())-1)
-		lista_salida = salida.splitlines()
-		cursor_x = 0
-		cursor_y = 1
-		#Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
-		#a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
-		height, width = stdscr.getmaxyx()
-		nlineasup = 1
-		nlineainf = height - 1 
-		inilinea = 0
-		finlinea = width - 1
+			trabajos = consultar_trabajos("ejecucion", usuario, False)	
+			num_lineas = str(len(trabajos.splitlines())-1)
+			if(int(num_lineas) ==  -1):
+				info = []
+				trabajos = consultar_trabajos("ejec-pend", usuario, False)	
+				num_lineas = str(len(trabajos.splitlines())-1)
+				lista_salida = trabajos.splitlines()
+			else:
+				lista_salida = trabajos.splitlines()
+			cursor_x = 0
+			cursor_y = 1
+			height, width = stdscr.getmaxyx()
+			nlineasup = 1
+			nlineainf = height - 1 
+			inilinea = 0
+			finlinea = width - 1
+		elif(k == ord('p')):
+			info = []
+			linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+			datos = linea.split()
+			usuario = os.getenv('USER')
+			trabajos = consultar_trabajos("pendientes",usuario,False)
+			num_lineas = str(len(trabajos.splitlines())-1)
+			if(int(num_lineas) ==  -1):
+				info = []
+				trabajos = consultar_trabajos("ejec-pend", usuario, False)	
+				num_lineas = str(len(trabajos.splitlines())-1)
+				lista_salida = trabajos.splitlines()
+			else:
+				lista_salida = trabajos.splitlines()
+			cursor_x = 0
+			cursor_y = 1
+			height, width = stdscr.getmaxyx()
+			nlineasup = 1
+			nlineainf = height - 1 
+			inilinea = 0
+			finlinea = width - 1
+		elif(k == ord('l')):
+			info = []
+			usuario = os.getenv('USER')
+			if(args.A):
+				user_id = int(os.getuid())
+				usuarios = validar_usuario_investigador(usuario, user_id)
+				trabajos = consultar_trabajos("ejec-pend",usuarios, False)
+			else:
+				trabajos = consultar_trabajos("ejec-pend",usuario, False)
+			num_lineas = str(len(trabajos.splitlines())-1)
+			if(num_lineas > 0):
+				lista_salida = trabajos.splitlines()
+			cursor_x = 0
+			cursor_y = 1
+			#Esto porque como es consulta probablemente el resultado sera de menos lineas por lo que vamos a reestablecer las variables
+			#a sus valores de inicio para que no halla problema al momento de mostrar la informacion en pantalla 
+			height, width = stdscr.getmaxyx()
+			nlineasup = 1
+			nlineainf = height - 1 
+			inilinea = 0
+			finlinea = width - 1
  
 # Manejo de parametros que puede recibir al ejecutar el script
 parser = argparse.ArgumentParser()
