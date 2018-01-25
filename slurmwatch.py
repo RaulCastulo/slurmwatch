@@ -262,6 +262,33 @@ def recuperar_linea(lista_salida, no_linea, nlineasup, nlineainf):
         contador = contador + 1
     return linea
 
+
+def obtener_variables_entorno(nodo):
+	info_pstree = commands.getoutput("ssh " + nodo + " pstree -p | grep slurm_script")
+
+	# Lista para almacenar los PIDs de info_pstree
+	pids = []
+	# Variables para indicar inicio y fin de PID
+	inicio_pid = 0
+	fin_pid = 0
+	# indice para hacer referencia a la posicion del caracter de la cadena info_pstree
+	indice = 0
+
+	for c in info_pstree:
+		if(c == '('):
+			inicio_pid = indice + 1
+		if( c == ')'):
+			fin_pid = indice
+		if( inicio_pid != 0 and fin_pid !=0):
+			pids.append(info_pstree[inicio_pid:fin_pid])
+			inicio_pid = 0
+			fin_pid = 0
+		indice = indice + 1
+	# Recuperamos el PID del subproceso del cual recuperamos variables de entorno
+	environ = commands.getoutput("ssh " + nodo + " strings /proc/" + pids[2] +"/environ")
+	return environ
+
+
 def desplegar_ayuda(stdscr):
     k = 0
     stdscr.clear()
@@ -422,8 +449,13 @@ def crear_pantalla(stdscr):
             inilinea = 0
             finlinea = width - 1
         elif(k == ord('t')):
-            salida = commands.getoutput("less ./running.py")
-            crear_subpantalla(stdscr, salida)
+			user = os.getenv('USER')
+			if(user == "root"):
+				linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
+				datos =  linea.split()
+				nodo = validar_nodo(datos[-1])
+				salida = obtener_variables_entorno(nodo)
+				crear_subpantalla(stdscr, salida)
         elif(k == ord('r')):
             linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
             datos = linea.split()
