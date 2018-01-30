@@ -293,6 +293,7 @@ def desplegar_ayuda(stdscr):
     k = 0
     stdscr.clear()
     stdscr.refresh()
+	#ayuda_dict = {1: ""}
     while (k != ord('q')):
         linea1 = "    Nota: "
         linea2 = "En esta version la palicacion debe de ser ejecutada con la terminal en pantalla completa"
