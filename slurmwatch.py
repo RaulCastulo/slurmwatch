@@ -653,7 +653,11 @@ elif(args.l):
 elif(args.username):
 	usuario = os.getenv('USER')
 	if(usuario == "root"):
-		trabajos = consultar_trabajos("ejec-pend", args.username, False)
+		info_finger = commands.getoutput("finger "+args.username)
+		if(info_finger.find("no such user") == -1):
+			trabajos = consultar_trabajos("ejec-pend", args.username, False)
+		else:
+			trabajos = consultar_trabajos("ejecucion", usuario, False)
 	else:
 		trabajos = consultar_trabajos("ejec-pend", usuario, False)
 	lista_salida = trabajos.splitlines()
