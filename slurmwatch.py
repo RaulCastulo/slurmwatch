@@ -600,6 +600,8 @@ parser.add_argument("-p", action="store_true", help="Imprime informacion de los 
 parser.add_argument("-tPD", action="store_true", help="Muestra informacion de los trabajos pendientes del usuario")
 parser.add_argument("-l", action="store_true", help="Muestra informacion de trabajos en ejecucion y pendientes del usuario")
 parser.add_argument("-tR", action="store_true", help="Muestra informacion de trabajos en ejecucion")
+parser.add_argument("-u", "--username", help="Muestra unicamente los trabajos del usuario")
+
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
 
@@ -646,6 +648,14 @@ elif(args.tR):
 elif(args.l):
 	usuario = os.getenv('USER')
 	trabajos = consultar_trabajos("ejec-pend", usuario, False)
+	lista_salida = trabajos.splitlines()
+	num_lineas = str(len(lista_salida) - 1)
+elif(args.username):
+	usuario = os.getenv('USER')
+	if(usuario == "root"):
+		trabajos = consultar_trabajos("ejec-pend", args.username, False)
+	else:
+		trabajos = consultar_trabajos("ejec-pend", usuario, False)
 	lista_salida = trabajos.splitlines()
 	num_lineas = str(len(lista_salida) - 1)
 else:
