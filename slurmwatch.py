@@ -290,55 +290,36 @@ def obtener_variables_entorno(nodo):
 
 
 def desplegar_ayuda(stdscr):
-    k = 0
-    stdscr.clear()
-    stdscr.refresh()
-	#ayuda_dict = {1: ""}
-    while (k != ord('q')):
-        linea1 = "    Nota: "
-        linea2 = "En esta version la palicacion debe de ser ejecutada con la terminal en pantalla completa"
-        linea3 = " q: Salir de la pantalla actual o salir del programa"
-        linea4 = " h: Muestra esta pantalla de ayuda"
-        linea5 = " R: Despliega la informacion de todos los trabajos que estan en ejecucion"
-        linea6 = " P: Despliega la informacion de todos los trabajos pendientes"
-        linea7 = " l: Despliega la informacion de todos los trabajos que estan alojados en el servidor"
-        linea8 = "Las siguientes opciones toman informacion de la linea que actualmente esta seleccionada y realizan lo siguiente"
-        linea9 = " Enter:  Permite visualizar informacion acerca del trabajo"
-        linea10 = " w: Permite hacer una conexion por ssh al nodo y hacer top"
-        linea11 = " e: Se contecta por ssh al nodo y ejecuta pstree con el usuaraio que esta utilizando el nodo"
-        linea12 = " u: Muestra la informacion de todos los trabajos del usuario"
-        linea13 = " p: Muestra la informacion de todos los trabajos pendientes del usuario"
-        linea14 = " r: Muestra la informacion de todos los trabajos en enjecucion del usuario"
-        
-        #stdscr.attron(curses.color_pair(4))
-        stdscr.addstr(1, 0, linea1, curses.color_pair(4))
-        stdscr.addstr(2, 0, linea2, curses.color_pair(5))
-        stdscr.addstr(5,0, linea3[0:3], curses.color_pair(6))
-        stdscr.addstr(5,3, linea3[3:], curses.color_pair(5))
-        stdscr.addstr(6,0, linea4[0:3], curses.color_pair(6))
-        stdscr.addstr(6,3, linea4[3:], curses.color_pair(5))
-        stdscr.addstr(7,0, linea5[0:3], curses.color_pair(6))
-        stdscr.addstr(7,3, linea5[3:], curses.color_pair(5))
-        stdscr.addstr(8,0, linea6[0:3], curses.color_pair(6))
-        stdscr.addstr(8,3, linea6[3:], curses.color_pair(5))
-        stdscr.addstr(9,0, linea7[0:3], curses.color_pair(6))
-        stdscr.addstr(9,3, linea7[3:], curses.color_pair(5))
-        stdscr.addstr(11, 0, linea8, curses.color_pair(5))
-        stdscr.addstr(13,0, linea9[0:7], curses.color_pair(6))
-        stdscr.addstr(13,7, linea9[7:], curses.color_pair(5))
-        stdscr.addstr(14,0, linea10[0:3], curses.color_pair(6))
-        stdscr.addstr(14,3, linea10[3:], curses.color_pair(5))
-        stdscr.addstr(15,0, linea11[0:3], curses.color_pair(6))
-        stdscr.addstr(15,3, linea11[3:], curses.color_pair(5))
-        stdscr.addstr(16,0, linea12[0:3], curses.color_pair(6))
-        stdscr.addstr(16,3, linea12[3:], curses.color_pair(5))
-        stdscr.addstr(17,0, linea13[0:3], curses.color_pair(6))
-        stdscr.addstr(17,3, linea13[3:], curses.color_pair(5))
-        stdscr.addstr(18,0, linea14[0:3], curses.color_pair(6))
-        stdscr.addstr(18,3, linea14[3:], curses.color_pair(5))
-        #stdscr.attroff(curses.color_pair(4))
-        
-        k = stdscr.getch()
+	k = 0
+	stdscr.clear()
+	stdscr.refresh()
+	height, width = stdscr.getmaxyx()
+	ayuda_dict = {1: "Nota:", 2: "En esta version la ventana de la terminal no debe ser redimensionada durante la ejecucion de la aplicacion", 3: "q: ", 4: "Salir de la pantalla actual o salir del programa", 5: "h: ", 6: "Muestra esta pantalla de ayuda", 7: "R: ", 8: "Despliega la informacion de todos los trabajos que estan en ejecucion", 9: "P: ", 10: "Despliega la informacion de todos los trabajos pendientes", 11: "l: ", 12: "Despliega la informacion de todos los trabajos que estan alojados en el servidor", 13: "Enter: ", 14: "Permite visualizar informacion acerca del trabajo", 15: "w: ", 16: "Permite hacer una conexion por ssh al nodo y hacer top", 17: "e: ", 18: "Se contecta por ssh al nodo y ejecuta pstree con el usuaraio que esta utilizando el nodo", 19: "u: ", 20: "Muestra la informacion de todos los trabajos del usuario", 21: "p: ", 22:"Muestra la informacion de todos los trabajos pendientes del usuario", 23: "r: ", 24: "Muestra la informacion de todos los trabajos en enjecucion del usuario"}
+	#Capturamos los datos del diccionario en una variable
+	info_ayuda = ""
+	for i in ayuda_dict:
+		info_ayuda = info_ayuda + ayuda_dict[i]
+    
+	#Agregamos a la pantalla las lineas
+	while (k != ord('q')):
+		x = 0
+		y = 0
+		inicio = 0
+		fin = 0
+		for i in ayuda_dict:
+			fin = fin + len(ayuda_dict[i])
+			if(i%2 != 0):
+				stdscr.attron(curses.color_pair(6))
+				stdscr.addstr(y, 0, info_ayuda[inicio:fin])
+				stdscr.attroff(curses.color_pair(6))
+				x = len(ayuda_dict[i])
+			else: 
+				stdscr.attron(curses.color_pair(5))
+				stdscr.addstr(y, x+1, info_ayuda[inicio:fin])
+				stdscr.attroff(curses.color_pair(5))
+				y = y + 2
+			inicio = inicio + len(ayuda_dict[i])
+		k = stdscr.getch()
 
 def crear_subpantalla(stdscr, salida):
     k = 0 
