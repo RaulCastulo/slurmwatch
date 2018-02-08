@@ -188,9 +188,15 @@ def consultar_trabajos(consulta, usuario, opcion_p):
 			ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
 			pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
 		else:
-			for i in usuarios:
-				ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
-				pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
+			if varios_usuarios(usuario):
+				usuarios = usuario.split(',')
+				for i in usuarios:
+					ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
+					pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
+			else:
+				for i in usuarios:
+					ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+i)).splitlines())
+					pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+i)).splitlines())
 	
 		if(len(ejecucion) > 0):
 			ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
@@ -226,6 +232,19 @@ def validar_usuario_investigador(usuario, user_id):
 	else:
 		usuarios = usuario
 	return usuarios
+
+def existe_usuario(usuario):
+	info_finger = commands.getoutput("finger "+usuario)
+	if(info_finger.find("no such user") == -1):
+		return True
+	else:
+		return False
+	
+def varios_usuarios(usuario):
+	if usuario.find(',') != -1:
+		return True
+	else: 
+		return False
 
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
@@ -653,11 +672,14 @@ elif(args.l):
 elif(args.username):
 	usuario = os.getenv('USER')
 	if(usuario == "root"):
-		info_finger = commands.getoutput("finger "+args.username)
-		if(info_finger.find("no such user") == -1):
+		if varios_usuarios(args.username):
 			trabajos = consultar_trabajos("ejec-pend", args.username, False)
 		else:
-			trabajos = consultar_trabajos("ejecucion", usuario, False)
+			if(existe_usuario(args.username)):
+				trabajos = consultar_trabajos("ejec-pend", args.username, False)
+			else:
+				sys.stdout.write("Este usuario no existe: "+args.username+"\n")
+				quit()
 	else:
 		trabajos = consultar_trabajos("ejec-pend", usuario, False)
 	lista_salida = trabajos.splitlines()
