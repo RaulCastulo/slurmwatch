@@ -216,6 +216,35 @@ def consultar_trabajos(consulta, usuario, opcion_p):
 				informacion_trabajos = imprime_trabajos(info, False) + "\n"
 	return informacion_trabajos
 
+# opcion_p: sera True o False, True si se recibio el parametro -p y False en caso contrario
+def consultar_trabajos_varios_usuarios(usuarios):
+	
+	#Esta variable es util para cuando hacemos echo y column -t 
+	#cabecera = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+	cabecera = ["CORES","INUSE","LOAD","%EFF","JOBID","PARTITION","NAME","USER","STATE","TIME","TIME_LIMIT","NODES","NODELIST(REASON)"]
+	info.append(cabecera)
+	informacion_trabajos = ""
+	lista_usuarios = usuarios.split(',')
+	ejecucion = []
+	pendientes = []
+
+	for u in lista_usuarios:
+		if existe_usuario(u):
+			ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+u)).splitlines())
+			pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+u)).splitlines())
+			if(len(ejecucion) > 0):
+				ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+				agregar_info(ejecucion)
+				ejecucion = []
+
+			if(len(pendientes) > 0):
+				pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+				agregar_info(pendientes)
+				pendientes = []
+
+	if(len(info) > 1):
+		informacion_trabajos = imprime_trabajos(info, True)
+	return informacion_trabajos
 
 def validar_usuario_investigador(usuario, user_id):
 	usuarios = " "
@@ -673,7 +702,7 @@ elif(args.username):
 	usuario = os.getenv('USER')
 	if(usuario == "root"):
 		if varios_usuarios(args.username):
-			trabajos = consultar_trabajos("ejec-pend", args.username, False)
+			trabajos = consultar_trabajos_varios_usuarios(args.username)
 		else:
 			if(existe_usuario(args.username)):
 				trabajos = consultar_trabajos("ejec-pend", args.username, False)
