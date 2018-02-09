@@ -228,15 +228,19 @@ def consultar_trabajos_varios_usuarios(usuarios):
 	ejecucion = []
 	pendientes = []
 
+	# En este recorrido obtenemos la informacion de todos los trabajos en ejecucion de cada usuario
 	for u in lista_usuarios:
 		if existe_usuario(u):
 			ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+u)).splitlines())
-			pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+u)).splitlines())
 			if(len(ejecucion) > 0):
 				ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
 				agregar_info(ejecucion)
 				ejecucion = []
 
+	# En este recorrido obtenemos la informacion de todos los trabajos en ejecucion de cada usuario
+	for u in lista_usuarios:
+		if existe_usuario(u):
+			pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+u)).splitlines())	
 			if(len(pendientes) > 0):
 				pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 				agregar_info(pendientes)
