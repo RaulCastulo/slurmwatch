@@ -267,8 +267,8 @@ def validar_usuario_investigador(usuario, user_id):
 	return usuarios
 
 def existe_usuario(usuario):
-	info_finger = commands.getoutput("finger "+usuario)
-	if(info_finger.find("no such user") == -1):
+	status_id, info_id = commands.getstatusoutput("id -u "+usuario)
+	if(status_id == 0):
 		return True
 	else:
 		return False
