@@ -214,6 +214,7 @@ def consultar_trabajos(consulta, usuario, opcion_p):
 				informacion_trabajos = imprime_trabajos(info, False) + "..." + str(len(info) - num_lineas_imprimir) + "+\n"
 			else:
 				informacion_trabajos = imprime_trabajos(info, False) + "\n"
+	
 	return informacion_trabajos
 
 # opcion_p: sera True o False, True si se recibio el parametro -p y False en caso contrario
@@ -227,6 +228,9 @@ def consultar_trabajos_varios_usuarios(usuarios):
 	lista_usuarios = usuarios.split(',')
 	ejecucion = []
 	pendientes = []
+	
+	usuarios_sin_trabajos_ejecucion = []  # Lista que almacenara los nombres de los usuarios sin trabajos en ejecucion
+	usuarios_sin_trabajos_pendientes = [] # Lista que almacenara los nombres de los usuarios sin trabajos pendientes
 
 	# En este recorrido obtenemos la informacion de todos los trabajos en ejecucion de cada usuario
 	for u in lista_usuarios:
@@ -236,6 +240,8 @@ def consultar_trabajos_varios_usuarios(usuarios):
 				ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
 				agregar_info(ejecucion)
 				ejecucion = []
+			else:
+				usuarios_sin_trabajos_ejecucion.append(u)
 
 	# En este recorrido obtenemos la informacion de todos los trabajos en ejecucion de cada usuario
 	for u in lista_usuarios:
@@ -245,6 +251,14 @@ def consultar_trabajos_varios_usuarios(usuarios):
 				pendientes = agregar_columnas_trabajos_pendientes(pendientes)
 				agregar_info(pendientes)
 				pendientes = []
+			else:
+				usuarios_sin_trabajos_pendientes.append(u)
+
+	# Comparamos los usuarios de ambas lista y si un usuario esta en ambas listas
+	# ese usuario no tiene trabajos alojados y se imprime el nombre de usuario en stdout
+	for u in usuarios_sin_trabajos_ejecucion:
+		if u in usuarios_sin_trabajos_pendientes:
+			sys.stdout.write("Usuario sin trabajos alojados en YOLTLA: "+u+"\n")
 
 	if(len(info) > 1):
 		informacion_trabajos = imprime_trabajos(info, True)
@@ -278,6 +292,18 @@ def varios_usuarios(usuario):
 		return True
 	else: 
 		return False
+
+# Metodo que nos servira para validar que existan todos los usuarios que son pasados como parametro en opcion -u
+def existen_usuarios(usuarios):
+	lista_usuarios = usuarios.split(',')
+	nombres_usuarios_correctos = True
+
+	for u in lista_usuarios:
+		if existe_usuario(u) == False:
+			sys.stdout.write("No existe usuario: "+u+"\n")
+			nombres_usuarios_correctos = False
+
+	return nombres_usuarios_correctos
 
 
 def inicializar_curses(stdscr, cursor_y, cursor_x):
@@ -706,7 +732,10 @@ elif(args.username):
 	usuario = os.getenv('USER')
 	if(usuario == "root"):
 		if varios_usuarios(args.username):
-			trabajos = consultar_trabajos_varios_usuarios(args.username)
+			if existen_usuarios(args.username):
+				trabajos = consultar_trabajos_varios_usuarios(args.username)
+			else:
+				quit()
 		else:
 			if(existe_usuario(args.username)):
 				trabajos = consultar_trabajos("ejec-pend", args.username, False)
@@ -717,6 +746,8 @@ elif(args.username):
 		trabajos = consultar_trabajos("ejec-pend", usuario, False)
 	lista_salida = trabajos.splitlines()
 	num_lineas = str(len(lista_salida) - 1)
+	
+
 else:
 	usuario = os.getenv('USER')
 	if(usuario == "root"):
@@ -727,6 +758,7 @@ else:
 	num_lineas = str(len(lista_salida) - 1)
 
 if(len(lista_salida) == 0):
+	sys.stdout.write("Usuario sin información que mostrar\n")
 	quit()
 
 
