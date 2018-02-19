@@ -282,7 +282,7 @@ def validar_usuario_investigador(usuario, user_id):
 
 def existe_usuario(usuario):
 	status_id, info_id = commands.getstatusoutput("id -u "+usuario)
-	if(status_id == 0):
+	if(status_id == 0 and len(usuario) != 0):
 		return True
 	else:
 		return False
@@ -300,7 +300,10 @@ def existen_usuarios(usuarios):
 
 	for u in lista_usuarios:
 		if existe_usuario(u) == False:
-			sys.stdout.write("No existe usuario: "+u+"\n")
+			if len(u) == 0:
+				sys.stdout.write("Revisar los nombres de usuario proporcionados: separados por \",\" y sin espacios en blanco \n")
+			else:
+				sys.stdout.write("No existe usuario: "+u+"\n")
 			nombres_usuarios_correctos = False
 
 	return nombres_usuarios_correctos
