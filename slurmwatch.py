@@ -5,6 +5,7 @@ import commands
 import sys
 import os
 import argparse
+import textwrap
 from operator import itemgetter
 
 
@@ -675,13 +676,26 @@ def crear_pantalla(stdscr):
 			finlinea = width - 1
  
 # Manejo de parametros que puede recibir al ejecutar el script
-parser = argparse.ArgumentParser()
+
+# Agregamos mensaje indicando que opciones tiene usuario y que opciones administrador
+parser = argparse.ArgumentParser(
+	formatter_class=argparse.RawDescriptionHelpFormatter,
+	epilog=textwrap.dedent('''\
+			Opciones para usuario:
+			[-A] [ -tR | -tPD | -l ] [-p]
+
+			Opciones para administrador
+			[-u USERNAME] [-p]
+			
+			'''))
+
+
 parser.add_argument("-A", action="store_true", help="Muestra informacion de trabajos del usuario, colaboradores y alumnos")
-parser.add_argument("-p", action="store_true", help="Imprime informacion de los trabajos en la terminal")
+parser.add_argument("-tR", action="store_true", help="Muestra informacion de trabajos en ejecucion del usuario")
 parser.add_argument("-tPD", action="store_true", help="Muestra informacion de los trabajos pendientes del usuario")
 parser.add_argument("-l", action="store_true", help="Muestra informacion de trabajos en ejecucion y pendientes del usuario")
-parser.add_argument("-tR", action="store_true", help="Muestra informacion de trabajos en ejecucion")
-parser.add_argument("-u", "--username", help="Muestra unicamente los trabajos del usuario")
+parser.add_argument("-u", "--username", help="Muestra unicamente los trabajos del usuario <USERNAME>")
+parser.add_argument("-p", action="store_true", help="Imprime informacion de los trabajos en la terminal")
 
 # Obtenemos los parametros que puede recibir el script
 args = parser.parse_args()
@@ -714,7 +728,11 @@ elif(args.p):
 		trabajos = consultar_trabajos("ejecucion", usuario, False)
 	else:
 		trabajos = consultar_trabajos("ejec-pend", usuario, True)
-	sys.stdout.write(trabajos)
+	
+	if(len(trabajos) != 0): 
+		sys.stdout.write(trabajos)
+	else:
+		sys.stdout.write("Usuario sin informacion que mostrar\n")
 	quit()
 elif(args.tPD):
 	usuario = os.getenv('USER')
