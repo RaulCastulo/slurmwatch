@@ -4,6 +4,7 @@ import os
 import sys
 import commands
 import argparse
+import textwrap
 from operator import itemgetter
 
 
@@ -51,6 +52,30 @@ def agregar_info(lista):
 			info.append(cadena)
 		else:
 			break
+
+# Para agregar la informacion completa de todos los trabajos del usuario
+def agregar_info_completa(lista):
+	
+	for j in lista:
+		lista_aux = []
+		"""
+		Hacemos la conversion de tipo int a tipo string para los primeros 4 elementos
+		de la lista que contiene la informacion de los trabajos en ejecucion, ya que los primeros 
+		4 elementos de esta lista son los valores asociados a CORES, INUSE, LOAD, %EFF
+		"""
+		lista_aux.append(str(j[0]))
+		lista_aux.append(str(j[1]))
+		lista_aux.append(str(j[2]))
+		lista_aux.append(str(j[3]))
+		
+		lista_aux.extend(j[4:]) 
+		
+		cadena = " ".join(lista_aux)
+		#if(len(info) < (max_trabajos + 1)):
+		info.append(cadena)
+		#else:
+			#break
+
 
 def root_agregar_info(lista):
 	
@@ -146,7 +171,59 @@ def agregar_columnas_trabajos_pendientes(pendientes):
 	aux.append(columnas)
     return aux
 
+
+def root_consultar_trabajos_un_usuario(usuario):
+	global max_trabajos
+	
+	cabecera_usuario = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+	cabecera_root =["CORES", "INUSE", "LOAD", "%EFF", "JOBID", "PARTITION", "NAME", "USER", "STATE", "TIME", "TIME_LIMIT", "NODES", "NODELIST(REASON)"]
+
+	ejecucion = []
+	pendientes = []
+
+
+	if(usuario == 'root'):
+		info.append(cabecera_root)
+		ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
+	#	pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
+	else:
+		info.append(cabecera_usuario)
+		ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+usuario)).splitlines())
+		pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+usuario)).splitlines())
+	
+	if(len(ejecucion) > 0):
+		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+		if(usuario == 'root'):
+			root_agregar_info(ejecucion)
+		else:
+			agregar_info_completa(ejecucion)
+
+	if(len(pendientes) > 0):
+		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+		if(usuario == 'root'):
+			root_agregar_info(pendientes)
+		else:
+			agregar_info_completa(pendientes)
+
+	if(len(info) > 1):
+		#if(usuario == 'root'):
+		#imprime_trabajos(info)
+		#else:
+		max_trabajos = len(info)
+		trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
+		print trabajos
+	else:
+		sys.stdout.write("Usuario "+"\'"+usuario+"\'"+" sin informacion que mostrar\n")
+
 def consultar_trabajos_un_usuario(usuario):
+	cabecera_usuario = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
+	cabecera_root =["CORES", "INUSE", "LOAD", "%EFF", "JOBID", "PARTITION", "NAME", "USER", "STATE", "TIME", "TIME_LIMIT", "NODES", "NODELIST(REASON)"]
+
+	ejecucion = []
+	pendientes = []
+
+	user = os.getenv('USER')
+
 	if(usuario == 'root'):
 		info.append(cabecera_root)
 		ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
@@ -176,21 +253,122 @@ def consultar_trabajos_un_usuario(usuario):
 		else:
 			trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
 			print trabajos
+	else:
+		sys.stdout.write("Usuario "+"\'"+usuario+"\'"+" sin informacion que mostrar\n")
+
+
 
 
 def consultar_trabajos_varios_usuarios(usuarios):
 	cabecera = ["CORES","INUSE","LOAD","%EFF","JOBID","PARTITION","NAME","USER","STATE","TIME","TIME_LIMIT","NODES","NODELIST(REASON)"]
 	info.append(cabecera)
-	informacion_
+	lista_usuarios = usuarios.split(',')
+	ejecucion = []
+	pendientes = []
+	
+	usuarios_sin_trabajos_ejecucion = []  # Lista que almacenara los nombres de los usuarios sin trabajos en ejecucion
+	usuarios_sin_trabajos_pendientes = [] # Lista que almacenara los nombres de los usuarios sin trabajos pendientes
 
+	# En este recorrido obtenemos la informacion de todos los trabajos en ejecucion de cada usuario
+	for u in lista_usuarios:
+		if existe_usuario(u):
+			ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+u)).splitlines())
+			if(len(ejecucion) > 0):
+				ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
+				root_agregar_info(ejecucion)
+				ejecucion = []
+			else:
+				usuarios_sin_trabajos_ejecucion.append(u)
 
-cabecera_usuario = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
-cabecera_root =["CORES", "INUSE", "LOAD", "%EFF", "JOBID", "PARTITION", "NAME", "USER", "STATE", "TIME", "TIME_LIMIT", "NODES", "NODELIST(REASON)"]
+	# En este recorrido obtenemos la informacion de todos los trabajos en ejecucion de cada usuario
+	for u in lista_usuarios:
+		if existe_usuario(u):
+			pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+u)).splitlines())	
+			if(len(pendientes) > 0):
+				pendientes = agregar_columnas_trabajos_pendientes(pendientes)
+				root_agregar_info(pendientes)
+				pendientes = []
+			else:
+				usuarios_sin_trabajos_pendientes.append(u)
 
-ejecucion = []
-pendientes = []
+	# Comparamos los usuarios de ambas lista y si un usuario esta en ambas listas
+	# ese usuario no tiene trabajos alojados y se imprime el nombre de usuario en stdout
+	for u in usuarios_sin_trabajos_ejecucion:
+		if u in usuarios_sin_trabajos_pendientes:
+			sys.stdout.write("Usuario sin trabajos alojados en YOLTLA: "+u+"\n")
+	
+	if(len(info) > 1):
+		imprime_trabajos(info)
+	else:
+		sys.stdout.write("Sin informacion que mostrar\n")
 
-# $USER == root 
-usuario = os.getenv('USER')
+def existe_usuario(usuario):
+	status_id, info_id = commands.getstatusoutput("id -u "+usuario)
+	if(status_id == 0 and len(usuario) != 0):
+		return True
+	else:
+		return False
+	
+def varios_usuarios(usuario):
+	if usuario.find(',') != -1:
+		return True
+	else: 
+		return False
 
+# Metodo que nos servira para validar que existan todos los usuarios que son pasados como parametro en opcion -u
+def existen_usuarios(usuarios):
+	lista_usuarios = usuarios.split(',')
+	nombres_usuarios_correctos = True
 
+	for u in lista_usuarios:
+		if existe_usuario(u) == False:
+			if len(u) == 0:
+				sys.stdout.write("Revisar los nombres de usuario proporcionados: separados por \",\" y sin espacios en blanco \n")
+			else:
+				sys.stdout.write("No existe usuario: "+u+"\n")
+			nombres_usuarios_correctos = False
+
+	return nombres_usuarios_correctos
+
+# Manejo de parametros que puede recibir al ejecutar el script
+
+# Agregamos mensaje indicando como pasar nombres de varios usuarios
+parser = argparse.ArgumentParser(
+	formatter_class=argparse.RawDescriptionHelpFormatter,
+	epilog=textwrap.dedent('''\
+			Para propocionar varios nombres de usuarios
+			debe ser de la siguiente forma:
+
+			slurm-jobs -u usuario1,usuario2,usario3,usuario4
+			
+			'''))
+
+# Agregar opcion -u 
+parser.add_argument("-u", "--username", help="Muestra unicamente los trabajos del usuario <USERNAME>")
+
+# Obtenemos los parametros que puede recibir el script
+args = parser.parse_args()
+
+# Validamos los casos posibles al recibir parametros para indicar que hacer en cada caso
+
+if(args.username):
+	usuario = os.getenv('USER')
+	if(usuario == "root"):
+		if varios_usuarios(args.username):
+			if existen_usuarios(args.username):
+				consultar_trabajos_varios_usuarios(args.username)
+			else:
+				quit()
+		else:
+			if(existe_usuario(args.username)):
+				root_consultar_trabajos_un_usuario(args.username)
+			else:
+				sys.stdout.write("Este usuario no existe: "+args.username+"\n")
+				quit()
+	else:
+		consultar_trabajos_un_usuario(usuario)
+
+else:
+	usuario = os.getenv('USER')
+	consultar_trabajos_un_usuario(usuario)
+	
