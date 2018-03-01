@@ -176,39 +176,23 @@ def root_consultar_trabajos_un_usuario(usuario):
 	global max_trabajos
 	
 	cabecera_usuario = "CORES INUSE LOAD %EFF JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON)"
-	cabecera_root =["CORES", "INUSE", "LOAD", "%EFF", "JOBID", "PARTITION", "NAME", "USER", "STATE", "TIME", "TIME_LIMIT", "NODES", "NODELIST(REASON)"]
 
 	ejecucion = []
 	pendientes = []
 
-
-	if(usuario == 'root'):
-		info.append(cabecera_root)
-		ejecucion.extend((commands.getoutput("squeue -h -l -tR")).splitlines())
-	#	pendientes.extend((commands.getoutput("squeue -h -l -tPD")).splitlines())
-	else:
-		info.append(cabecera_usuario)
-		ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+usuario)).splitlines())
-		pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+usuario)).splitlines())
+	info.append(cabecera_usuario)
+	ejecucion.extend((commands.getoutput("squeue -h -l -tR -u "+usuario)).splitlines())
+	pendientes.extend((commands.getoutput("squeue -h -l -tPD -u "+usuario)).splitlines())
 	
 	if(len(ejecucion) > 0):
 		ejecucion = agregar_columnas_trabajos_ejecucion(ejecucion)
-		if(usuario == 'root'):
-			root_agregar_info(ejecucion)
-		else:
-			agregar_info_completa(ejecucion)
+		agregar_info_completa(ejecucion)
 
 	if(len(pendientes) > 0):
 		pendientes = agregar_columnas_trabajos_pendientes(pendientes)
-		if(usuario == 'root'):
-			root_agregar_info(pendientes)
-		else:
-			agregar_info_completa(pendientes)
+		agregar_info_completa(pendientes)
 
 	if(len(info) > 1):
-		#if(usuario == 'root'):
-		#imprime_trabajos(info)
-		#else:
 		max_trabajos = len(info)
 		trabajos = commands.getoutput('echo '+"'"+imprimir_info(info)+"'"+' | column -t')
 		print trabajos
@@ -367,7 +351,6 @@ if(args.username):
 				quit()
 	else:
 		consultar_trabajos_un_usuario(usuario)
-
 else:
 	usuario = os.getenv('USER')
 	consultar_trabajos_un_usuario(usuario)
