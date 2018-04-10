@@ -37,10 +37,6 @@ user@hostname:~$ slurm-watch -u user1,user2,user3,user4
 
 La aplicación cuenta con teclas especiales que pueden ser utilizadas durante la ejecución de ésta.  
 
-
-[![asciicast](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.png)](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4)
-
-
 | Tecla | Función | 
 | ------ | ------ |
 | q | Salir de la aplicación, o de la ventana en la que se encuentra actualmente. |
@@ -65,3 +61,6 @@ Funciones de las teclas especiales en modo administrador.
 Nota:
 Para poder desplazar la información estan como apoyo las teclas barra espaciadora, Re Pág y Av Pág.
 
+
+
+[![asciicast](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.png)](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4)
