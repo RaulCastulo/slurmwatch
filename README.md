@@ -1,5 +1,5 @@
 
-## 1. OBJETIVOS DE LA APLICACION
+## 1. Objetivos de la aplicación.
 
 Mostrar información correspondiente a los trabajos que el usuario tiene alojados en el nodo Yoltla para poder tener una mejor administración de éstos. 
 
@@ -8,7 +8,7 @@ Mostrar información correspondiente a los trabajos que el usuario tiene alojado
 La información se despliega a través de la terminal en la que se ha sido ejecutada la aplicación.
 
 
-## 2. ACCESO A LA APLICACION
+## 2. Acceso a la aplicación.
 
 La aplicación permite recibir opciones al momento de su ejecución, mismos que se explican a continuación:
 
@@ -27,7 +27,7 @@ Esta opción sólo esta permitida en modo administrador.
 | ------ | ------ |
 | -u USERNAME, --username USERNAME | Permite visualizar la información de los trabajos del usuario <USERNAME> |
 
-## 3. OPCIONES DURANTE LA EJECUCION DE LA APLICACION
+## 3. Opciones durante la ejecución de la aplicación.
 
 La aplicación cuenta con teclas especiales que pueden ser utilizadas durante la ejecución de ésta.  
 
