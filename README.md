@@ -10,20 +10,20 @@ La información se despliega a través de la terminal en la que se ha sido ejecu
 
 ## 2. ACCESO A LA APLICACION
 
-La aplicación permite recibir opciones al momento de su ejecución, mismos que se explican a continuación: 
-| Opción | Función |
-| :------- | :------: |
-| -h | Muestra en mensaje de ayuda. |
-|-A | Muestra información de trabajos del usuario, colaboradores y alumnos. |
-|-tR | Muestra información de trabajos del usuario que se encuentran en ejecución. |
-|-tPD | Muestra información de trabajos del usuario que estan pendientes. |
-|-l | Muestra información de trabajos del usuario en ejecución y trabajos pendientes. |
-|-p | Imprime información acerca de los trabajos en ejecución y trabajos pendientes en la terminal. |
+La aplicación permite recibir opciones al momento de su ejecución, mismos que se explican a continuación:  
+| Opción | Función |  
+| :------- | :------: |  
+| -h | Muestra en mensaje de ayuda. |  
+|-A | Muestra información de trabajos del usuario, colaboradores y alumnos. |  
+|-tR | Muestra información de trabajos del usuario que se encuentran en ejecución. |  
+|-tPD | Muestra información de trabajos del usuario que estan pendientes. |  
+|-l | Muestra información de trabajos del usuario en ejecución y trabajos pendientes. |  
+|-p | Imprime información acerca de los trabajos en ejecución y trabajos pendientes en la terminal. |  
 
-Esta opción sólo esta permitida en modo administrador.
-| Opción | Función |
-| :------- | :------: |
-| -u USERNAME, --username USERNAME |	Muestra la información de todos los trabajos del usuario <USERNAME> |  
+Esta opción sólo esta permitida en modo administrador.  
+| Opción | Función |  
+| :------- | :------: |  
+| -u USERNAME, --username USERNAME |	Muestra la información de todos los trabajos del usuario <USERNAME> |    
   
 
 ## 3. OPCIONES DURANTE LA EJECUCION DE LA APLICACION
