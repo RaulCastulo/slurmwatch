@@ -21,15 +21,17 @@ La aplicación permite recibir opciones al momento de su ejecución, mismos que 
 |-l | Muestra información de trabajos del usuario en ejecución y trabajos pendientes. |
 |-p | Imprime información acerca de los trabajos en ejecución y trabajos pendientes en la terminal. |
 
-Esta opción sólo esta permitida en modo administrador y se pueden proporcionar varios usuarios separando a cada nombre de usuario por "," y sin espacios, ejemplo:
-
-`
-user@hostname:~$ slurm-watch -u user1,user2,user3,user4
-`
+Esta opción sólo esta permitida en modo administrador. 
 
 | Opción | Función |
 | ------ | ------ |
 | -u USERNAME, --username USERNAME | Permite visualizar la información de los trabajos del usuario <USERNAME> |
+
+Se pueden proporcionar varios nombres de usuario separando a cada uno por "," y sin espacios, ejemplo:
+
+`
+user@hostname:~$ slurm-watch -u user1,user2,user3,user4
+`
 
 ## 3. Opciones durante la ejecución de la aplicación.
 
