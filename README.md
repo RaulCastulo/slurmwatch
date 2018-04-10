@@ -1,7 +1,3 @@
-<!DOCTYPE html> 
-<html> 
-<body> 
-
 
 ## 1. Objetivos de la aplicación.
 
@@ -66,10 +62,9 @@ Nota:
 Para poder desplazar la información estan como apoyo las teclas barra espaciadora, Re Pág y Av Pág.
 
 
-<script src="https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.js" id="asciicast-7ErMb7TN31zE5I1VdCsTFB1x4" async></script> 
-</video>
-</body> 
-</html>
+<script src="https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.js" id="asciicast-7ErMb7TN31zE5I1VdCsTFB1x4" async>
+
+</script> 
 
 
 
