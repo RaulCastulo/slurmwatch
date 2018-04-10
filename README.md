@@ -62,18 +62,7 @@ Nota:
 Para poder desplazar la información estan como apoyo las teclas barra espaciadora, Re Pág y Av Pág.
 
 
-[![asciicast](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.png)](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4)
-
-
-<!DOCTYPE html> 
-<html> 
-<body> 
-<video width="400" controls>
-  <source src="https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4" type="video/mp4">
-  <source src="mov_bbb.ogg" type="video/ogg">
-</video>
-</body> 
-</html>
+<a href="https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4" target="_blank"><img src="https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.png" /></a>
 
 
 
