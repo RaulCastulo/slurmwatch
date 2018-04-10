@@ -52,5 +52,6 @@ Funciones de las teclas especiales en modo administrador.
 | p | Muestra informacion de todos los trabajos pendientes. |
 | l | Muestra información de todos los trabajos que se encuentran en ejecución y trabajos pendientes. |
 
-
+Nota:
+Para poder desplazar la información estan como apoyo las teclas barra espaciadora, Re Pág y Av Pág.
 
