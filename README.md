@@ -65,3 +65,5 @@ Para poder desplazar la información estan como apoyo las teclas barra espaciado
 [![asciicast](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.png)](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4)
 
 
+<a href="https://asciinema.org/a/14?autoplay=1"><img src="https://asciinema.org/a/14.png" width="836"/></a>
+
