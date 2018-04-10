@@ -1,6 +1,11 @@
 
 ## 1. Objetivos de la aplicación.
 
+
+* <small>texto pequeño</small>
+* <big>texto grande</big> 
+
+
 Mostrar información correspondiente a los trabajos que el usuario tiene alojados en el nodo Yoltla para poder tener una mejor administración de éstos. 
 
 **Modo de impresión**
@@ -68,6 +73,3 @@ Para poder desplazar la información estan como apoyo las teclas barra espaciado
 
 
 
-
-* <small>texto pequeño</small>
-* <big>texto grande</big> 
