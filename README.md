@@ -22,8 +22,8 @@ Opción | Función
 
 Esta opción sólo esta permitida en modo administrador.  
 Opción | Función  
--- | --  
--u USERNAME, --username USERNAME |	Muestra la información de todos los trabajos del usuario <USERNAME>  
+-- | -- 
+-u USERNAME, --username USERNAME |	Muestra la información de todos los trabajos del usuario <USERNAME> 
   
 
 ## 3. OPCIONES DURANTE LA EJECUCION DE LA APLICACION
