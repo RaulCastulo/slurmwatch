@@ -23,9 +23,9 @@ La aplicación permite recibir opciones al momento de su ejecución, mismos que 
 
 Esta opción sólo esta permitida en modo administrador y se pueden proporcionar varios usuarios separando a cada nombre de usuario por "," y sin espacios, ejemplo:
 
-´´´
+´
 slurm-watch -u user1,user2,user3,user3
-´´´
+´
 
 | Opción | Función |
 | ------ | ------ |
