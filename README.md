@@ -46,7 +46,7 @@ Funciones de las teclas especiales en modo administrador.
 
 | Tecla | Función |
 | ------- | ------- |
-| Enter | Ver información acerca del trabajo que actualmente se encuentre seleccionado.|
+| Enter | Despliega información acerca del trabajo que actualmente se encuentre seleccionado.|
 | u | Ver información de todos los trabajos en ejecución y trabajos pendientes del usuario que actualmente se encuentra seleccionado. |
 | r | Permite ver información de todos los trabajos que se encuentran en ejecución. |
 | p | Muestra información de todos los trabajos pendientes. |
