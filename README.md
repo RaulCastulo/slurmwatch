@@ -21,8 +21,8 @@ Opción | Función
 |-p | Imprime información acerca de los trabajos en ejecución y trabajos pendientes en la terminal. |
 
 Esta opción sólo esta permitida en modo administrador.  
-Opción | Función
--- | --
+Opción | Función  
+-- | --  
 -u USERNAME, --username USERNAME | Muestra la información de todos los trabajos del usuario <USERNAME> 
   
 
