@@ -10,7 +10,8 @@ La información se despliega a través de la terminal en la que se ha sido ejecu
 
 ## 2. ACCESO A LA APLICACION
 
-La aplicación permite recibir opciones al momento de su ejecución, mismos que se explican a continuación:  
+La aplicación permite recibir opciones al momento de su ejecución, mismos que se explican a continuación:
+
 Opción | Función 
 -- | --
 -h | Muestra en mensaje de ayuda.
