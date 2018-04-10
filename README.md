@@ -37,6 +37,10 @@ user@hostname:~$ slurm-watch -u user1,user2,user3,user4
 
 La aplicación cuenta con teclas especiales que pueden ser utilizadas durante la ejecución de ésta.  
 
+
+[![asciicast](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.png)](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4)
+
+
 | Tecla | Función | 
 | ------ | ------ |
 | q | Salir de la aplicación, o de la ventana en la que se encuentra actualmente. |
