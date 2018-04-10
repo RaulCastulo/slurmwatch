@@ -62,5 +62,4 @@ Nota:
 Para poder desplazar la información estan como apoyo las teclas barra espaciadora, Re Pág y Av Pág.
 
 
-
-[![asciicast]](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4)
+[![asciicast](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.png)](https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4)
