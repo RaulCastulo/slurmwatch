@@ -64,9 +64,7 @@ Para poder desplazar la información estan como apoyo las teclas barra espaciado
 <!DOCTYPE html> 
 <html> 
 <body> 
-
 <script src="https://asciinema.org/a/7ErMb7TN31zE5I1VdCsTFB1x4.js" id="asciicast-7ErMb7TN31zE5I1VdCsTFB1x4" async>
-
 </script> 
 </video>
 </body> 
