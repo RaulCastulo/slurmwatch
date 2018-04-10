@@ -35,8 +35,22 @@ La aplicación cuenta con teclas especiales que pueden ser utilizadas durante la
 | ------ | ------ |
 | q | Salir de la aplicación, o de la ventana en la que se encuentra actualmente. |
 | Enter | Ver información acerca del trabajo que actualmente se encuentre seleccionado.|
-| u | Ver todos los trabajos del usuario que actualmente se encuentra seleccionado.|
-| r | Ver los trabajos en ejecución del usuario que se encuentre seleccionado.|
-| p | Ver los trabajos pendientes del usuario que actualmente este seleccionado. |
-| l | Muestra información de todos los trabajos em ejecucion y trabajos pendientes del usuario | 
-| h	| Despliega una ventana de ayuda. 
+| u | Muestra información de todos los trabajos en ejecucion y trabajos pendientes del usuario. |
+| r | Ver información de los trabajos en ejecución del usuario.|
+| p | Permite ver información de los trabajos pendientes del usuario. |
+| l | Muestra información de todos los trabajos en ejecucion y trabajos pendientes del usuario. | 
+| h	| Despliega una ventana de ayuda. |
+
+
+Funciones de las teclas especiales en modo administrador.
+
+| Tecla | Función |
+| ------- | ------- |
+| Enter | Ver información acerca del trabajo que actualmente se encuentre seleccionado.|
+| u | Ver todos los trabajos en ejecución y trabajos pendientes del usuario que actualmente se encuentra seleccionado. |
+| r | Permite ver información de todos los trabajos que se encuentran en ejecución. |
+| p | Muestra informacion de todos los trabajos pendientes. |
+| l | Muestra información de todos los trabajos que se encuentran en ejecución y trabajos pendientes. |
+
+
+
