@@ -12,10 +12,10 @@ La información se despliega a través de la terminal en la que se ha sido ejecu
 
 La aplicación permite recibir opciones al momento de su ejecución, mismos que se explican a continuación:
 
-Opción | Función 
--- | --
--h | Muestra en mensaje de ayuda.
--A | Muestra información de trabajos del usuario, colaboradores y alumnos. |
+|Opción | Función | 
+| ------ | ------ |
+| -h | Muestra en mensaje de ayuda. |
+| -A | Muestra información de trabajos del usuario, colaboradores y alumnos. |
 |-tR | Muestra información de trabajos del usuario que se encuentran en ejecución. |
 |-tPD | Muestra información de trabajos del usuario que estan pendientes. |
 |-l | Muestra información de trabajos del usuario en ejecución y trabajos pendientes. |
@@ -31,6 +31,12 @@ Esta opción sólo esta permitida en modo administrador.
 
 La aplicación cuenta con teclas especiales que pueden ser utilizadas durante la ejecución de ésta.  
 
-q:	Salir de la aplicación, o de la ventana en la que se encuentra actualmente.  
-
-h:	Despliega una pequeña ayuda explicando el funcionamiento de las teclas especiales.  
+| Tecla | Función | 
+| ------ | ------ |
+| q | Salir de la aplicación, o de la ventana en la que se encuentra actualmente. |
+| Enter | Ver información acerca del trabajo que actualmente se encuentre seleccionado.|
+| u | Ver todos los trabajos del usuario que actualmente se encuentra seleccionado.|
+| r | Ver los trabajos en ejecución del usuario que se encuentre seleccionado.|
+| p | Ver los trabajos pendientes del usuario que actualmente este seleccionado. |
+| l | Muestra información de todos los trabajos em ejecucion y trabajos pendientes del usuario | 
+| h	| Despliega una ventana de ayuda. 
