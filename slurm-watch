@@ -147,6 +147,38 @@ def agregar_columnas_trabajos_pendientes(pendientes):
 	aux.append(columnas)
     return aux
 
+def consultar_informacion_trabajo(opciones, JobId):
+	llaves = []
+	info_trabajo = {}
+	#opciones = "JobId UserId WorkDir StdErr StdIn StdOut"
+	arreglo_opciones = opciones.split()
+	informacion_trabajo = ""
+	status_lineas,salida_lineas = commands.getstatusoutput('scontrol show jobid -dd ' + JobId)
+	status,salida = commands.getstatusoutput('scontrol --quiet  write batch_script ' + JobId + ' script.txt')
+	
+	if status_lineas  == 0 and status == 0:
+		lista_lineas = salida_lineas.splitlines()
+		for l in lista_lineas:
+			aux = l.split("=")
+			llaves.append(aux[0].strip())
+
+		for i in range(len(llaves)):
+			info_trabajo[llaves[i]] = lista_lineas[i]
+
+
+		for llave in arreglo_opciones:
+			informacion_trabajo = informacion_trabajo + info_trabajo[llave] + "\n"
+	
+		f = open('script.txt','r')
+		mensaje = f.read()
+		informacion_trabajo = informacion_trabajo + "\n" + mensaje
+		f.close()
+		os.remove('script.txt')
+	else:
+		informacion_trabajo = "No se pudo recuperar info del trabajo"
+	return informacion_trabajo
+
+
 # opcion_p: sera True o False, True si se recibio el parametro -p y False en caso contrario
 def consultar_trabajos(consulta, usuario, opcion_p):
 	
@@ -585,13 +617,16 @@ def crear_pantalla(stdscr):
 		if((k == curses.KEY_DOWN) or (k == curses.KEY_UP) or (k == curses.KEY_LEFT) or (k == curses.KEY_RIGHT) or (k == curses.KEY_NPAGE) or (k == 32) or (k == curses.KEY_PPAGE) or (k == curses.KEY_RESIZE)):
 			cursor_y, height, width, nlineasup, nlineainf, inilinea, finlinea= sroll(stdscr, k, cursor_y, cursor_x, height, width, nlineasup, nlineainf, inilinea, finlinea, lista_salida)
 		elif(k == ord("\n")):
+			usuario = os.getenv('USER')
 			#Recuperamos la informacion de la linea en la que actualmente estael cursor
 			linea = recuperar_linea(lista_salida, cursor_y, nlineasup, nlineainf)
 			#Guardamos cada una de las cadenas que contiene la linea en un arreglo
 			datos = linea.split()
-			jobid = datos[-9]
-			salida =  commands.getoutput("scontrol show jobid -dd  "+jobid)
-			crear_subpantalla(stdscr, salida)
+			JobId = datos[-9]
+			usuario_linea_actual = datos[-6]
+			if usuario == usuario_linea_actual or usuario == "root":
+				salida =  consultar_informacion_trabajo("JobId UserId WorkDir StdErr StdIn StdOut", JobId)
+				crear_subpantalla(stdscr, salida)
 		elif(k == ord('h')):
 			desplegar_ayuda(stdscr)
 		elif(k == ord('u')):
